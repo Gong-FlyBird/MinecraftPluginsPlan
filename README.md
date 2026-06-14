@@ -200,59 +200,6 @@ MinecraftPluginsPlan/
 
 ---
 
-## ❓ 常见问题
-
-<details>
-<summary><strong>Q: 我已经在页面里写了很多插件计划，同步到 GitHub 会泄漏吗？</strong></summary>
-
-**A: 不会。** 你的数据在浏览器 localStorage 中，`git push` 只上传项目文件夹里的源代码文件（`.jsx`、`.css`、配置文件等），不会读取浏览器存储。
-</details>
-
-<details>
-<summary><strong>Q: 多人协作时别人会看到我的数据吗？</strong></summary>
-
-**A:** 数据存在你自己的浏览器里。其他人 `git clone` 后看到的是空面板，他们各自的数据存在他们自己的浏览器中。
-</details>
-
-<details>
-<summary><strong>Q: 如何迁移数据到另一台电脑？</strong></summary>
-
-**A:** 在当前电脑「数据管理 → 导出 JSON」→ 将文件传到新电脑 → 在新电脑「数据管理 → 导入 JSON」。
-</details>
-
-<details>
-<summary><strong>Q: 数据会丢失吗？</strong></summary>
-
-**A:** 清除浏览器数据（缓存、Cookie、网站数据）会导致 localStorage 被清空。建议定期导出备份。
-</details>
-
----
-
-## 📤 同步到 GitHub
-
-如果你的项目还没有关联远程仓库：
-
-```bash
-# 1. 在 GitHub 新建空仓库（不要勾选任何初始化文件）
-
-# 2. 在项目目录执行
-git remote add origin https://github.com/你的用户名/仓库名.git
-git add .
-git commit -m "init: Minecraft 插件开发计划工具"
-git branch -M main
-git push -u origin main
-```
-
-日常更新：
-
-```bash
-git add .
-git commit -m "feat: 新增/修复了什么"
-git push
-```
-
----
-
 ## 📄 许可证
 
 本项目基于 MIT 许可证开源。
