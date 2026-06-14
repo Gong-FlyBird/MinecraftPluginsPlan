@@ -184,7 +184,6 @@ MinecraftPluginsPlan/
 
 ```
 你的插件计划数据 → 浏览器 localStorage（仅存你本机）
-源代码            → GitHub（只有代码，零数据）
 ```
 
 **所有数据仅存储在浏览器本地，永不离开你的电脑。**
