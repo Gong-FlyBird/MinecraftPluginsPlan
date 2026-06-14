@@ -9,6 +9,7 @@ import TimelineView from './components/TimelineView';
 import DataManager from './components/DataManager';
 import StatsDashboard from './components/StatsDashboard';
 import SprintBoard from './components/SprintBoard';
+import ReleaseLog from './components/ReleaseLog';
 import TagManager from './components/TagManager';
 import SettingsPanel from './components/SettingsPanel';
 import Modal from './components/Modal';
@@ -23,12 +24,14 @@ export default function App() {
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const hideTimer = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const {
     store, addPlugin, updatePlugin, deletePlugin, movePluginStatus,
     addMilestone, updateMilestone, deleteMilestone,
     toggleTask, addTask, deleteTask,
     addIdea, updateIdea, deleteIdea, addPluginIdea,
+    addRelease, deleteRelease,
     addTag, removeTag,
     importStore, resetStore,
     updateSettings,
@@ -38,6 +41,13 @@ export default function App() {
   const lang = settings.language || 'zh';
   const t = useT(lang);
   const autoHide = settings.autoHide || false;
+
+  // ── 响应式 ──
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // ── 同步主题类名到 <html> ──
   useEffect(() => {
@@ -87,10 +97,13 @@ export default function App() {
     setSidebarVisible(true);
   }, []);
 
-  // 主内容左边距
-  const sidebarWidth = autoHide
-    ? (sidebarVisible ? (sidebarCollapsed ? '60px' : '220px') : '0px')
-    : (sidebarCollapsed ? '60px' : '220px');
+  // 主内容左边距（移动端侧边栏覆盖，不计入）
+  const sidebarWidth = isMobile ? '0px' : (
+    autoHide
+      ? (sidebarVisible ? (sidebarCollapsed ? '60px' : '220px') : '0px')
+      : (sidebarCollapsed ? '60px' : '220px')
+  );
+  const sidebarOverlay = isMobile && !sidebarCollapsed;
 
   // ── 键盘快捷键 ──
   useEffect(() => {
@@ -122,8 +135,8 @@ export default function App() {
       <div className="bg-orb bg-orb-2" />
       <div className="bg-orb bg-orb-3" />
 
-      {/* 触发区：鼠标移到左边缘弹出侧边栏 */}
-      {autoHide && !sidebarVisible && (
+      {/* 触发区 */}
+      {((autoHide && !sidebarVisible) || isMobile) && (
         <div
           onMouseEnter={handleTriggerEnter}
           className="fixed left-0 top-0 bottom-0 w-[6px] z-50 cursor-default"
@@ -139,10 +152,12 @@ export default function App() {
         pluginCount={plugins.length}
         t={t}
         onOpenSettings={() => setSettingsOpen(true)}
-        visible={sidebarVisible}
+        visible={sidebarVisible || isMobile}
         autoHide={autoHide}
         onMouseEnter={handleSidebarEnter}
         onMouseLeave={handleSidebarLeave}
+        isMobile={isMobile}
+        onMobileClose={() => setSidebarCollapsed(true)}
       />
 
       <ToastContainer />
@@ -161,6 +176,20 @@ export default function App() {
           <SettingsPanel settings={settings} onUpdate={updateSettings} t={t} />
         </div>
       </Modal>
+
+      {/* 移动端汉堡按钮 */}
+      {isMobile && sidebarCollapsed && (
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="fixed top-4 left-4 z-50 w-10 h-10 glass flex items-center justify-center md:hidden"
+        >
+          <div className="space-y-1">
+            <span className="block w-5 h-[2px] bg-hermes-text rounded" />
+            <span className="block w-5 h-[2px] bg-hermes-text rounded" />
+            <span className="block w-5 h-[2px] bg-hermes-text rounded" />
+          </div>
+        </button>
+      )}
 
       {/* Main Content */}
       <main
@@ -226,6 +255,14 @@ export default function App() {
           )}
           {activeTab === 'timeline' && <TimelineView plugins={plugins} t={t} />}
           {activeTab === 'stats' && <StatsDashboard plugins={plugins} t={t} />}
+          {activeTab === 'releases' && (
+            <ReleaseLog
+              plugins={plugins}
+              onAddRelease={addRelease}
+              onDeleteRelease={deleteRelease}
+              t={t}
+            />
+          )}
           {activeTab === 'tags' && (
             <TagManager
               plugins={plugins} storeTags={store.tags || []}

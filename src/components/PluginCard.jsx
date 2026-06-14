@@ -1,12 +1,15 @@
-import { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Edit3, Trash2, Clock, Tag, ChevronDown, ChevronRight } from 'lucide-react';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { timeAgo, calcProgress } from '../utils/helpers';
 
 export default function PluginCard({ plugin, onEdit, onDelete, dragOverlay, t }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expandedMap, setExpandedMap] = useLocalStorage('plugin-expanded', {});
+  const expanded = expandedMap[plugin.id] || false;
+
+  const setExpanded = (val) => setExpandedMap(prev => ({ ...prev, [plugin.id]: val }));
 
   const {
     attributes, listeners, setNodeRef, transform, transition, isDragging,
@@ -34,7 +37,7 @@ export default function PluginCard({ plugin, onEdit, onDelete, dragOverlay, t })
       {/* Collapsed: name only */}
       <div
         className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none"
-        onClick={() => setExpanded(prev => !prev)}
+        onClick={() => setExpanded(!expanded)}
       >
         <button {...attributes} {...listeners}
           onClick={e => e.stopPropagation()}
@@ -50,7 +53,7 @@ export default function PluginCard({ plugin, onEdit, onDelete, dragOverlay, t })
 
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0">v{plugin.version}</span>
 
-        <button onClick={e => { e.stopPropagation(); setExpanded(prev => !prev); }}
+        <button onClick={e => { e.stopPropagation(); setExpanded(!expanded); }}
           className="text-hermes-text-muted/30 hover:text-hermes-gold/60 transition-colors flex-shrink-0">
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </button>

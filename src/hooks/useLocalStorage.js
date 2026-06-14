@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 
 /** localStorage 持久化 Hook，支持自动同步到 IndexedDB 备份 */
-export function useLocalStorage(key, initialValue) {
+export function useLocalStorage(key, initialValue, migrate) {
   const [storedValue, setStoredValue] = useState(() => {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      const raw = item ? JSON.parse(item) : initialValue;
+      return migrate ? migrate(raw) : raw;
     } catch {
       return initialValue;
     }

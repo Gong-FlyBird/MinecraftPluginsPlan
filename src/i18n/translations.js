@@ -74,6 +74,8 @@ const zh = {
   'sidebar.tags.desc': '分类与筛选',
   'sidebar.data': '数据管理',
   'sidebar.data.desc': '导入/导出',
+  'sidebar.releases': '版本发布',
+  'sidebar.releases.desc': '发布历史',
   'sidebar.settings': '设置',
 
   /* ── 看板 ── */
@@ -276,6 +278,8 @@ const en = {
   'sidebar.tags.desc': 'Categories & filters',
   'sidebar.data': 'Data',
   'sidebar.data.desc': 'Import/Export',
+  'sidebar.releases': 'Releases',
+  'sidebar.releases.desc': 'Release history',
   'sidebar.settings': 'Settings',
 
   'kanban.title': 'Kanban Board',
@@ -464,6 +468,8 @@ const ja = {
   'sidebar.tags.desc': 'カテゴリとフィルター',
   'sidebar.data': 'データ',
   'sidebar.data.desc': 'インポート/エクスポート',
+  'sidebar.releases': 'リリース',
+  'sidebar.releases.desc': 'リリース履歴',
   'sidebar.settings': '設定',
 
   'kanban.title': 'プラグインボード',

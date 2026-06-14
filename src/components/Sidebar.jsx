@@ -12,23 +12,33 @@ const NAV_ITEMS = [
   { id: 'stats', labelKey: 'sidebar.stats', icon: BarChart3, descKey: 'sidebar.stats.desc' },
   { id: 'tags', labelKey: 'sidebar.tags', icon: Tag, descKey: 'sidebar.tags.desc' },
   { id: 'data', labelKey: 'sidebar.data', icon: Database, descKey: 'sidebar.data.desc' },
+  { id: 'releases', labelKey: 'sidebar.releases', icon: Package, descKey: 'sidebar.releases.desc' },
 ];
 
 export default function Sidebar({
   activeTab, onTabChange, collapsed, onToggle, pluginCount, t, onOpenSettings,
   visible = true, autoHide = false,
   onMouseEnter, onMouseLeave,
+  isMobile, onMobileClose,
 }) {
   const widthClass = collapsed ? 'w-[60px]' : 'w-[220px]';
   const hiddenClass = autoHide && !visible ? '-translate-x-full' : 'translate-x-0';
 
   return (
-    <aside
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
-    >
-      <div className="absolute inset-0 sidebar-glass" />
+    <>
+      {/* 移动端遮罩 */}
+      {isMobile && !collapsed && (
+        <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden" onClick={onMobileClose} />
+      )}
+
+      <aside
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass} ${
+          isMobile && collapsed ? '-translate-x-full' : ''
+        }`}
+      >
+        <div className="absolute inset-0 sidebar-glass" />
 
       <div className="relative flex flex-col h-full py-4">
         {/* Logo */}
@@ -99,5 +109,6 @@ export default function Sidebar({
         </div>
       </div>
     </aside>
+    </>
   );
 }

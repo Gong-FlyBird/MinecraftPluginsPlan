@@ -65,24 +65,44 @@ export default function StatsDashboard({ plugins, t }) {
         ))}
       </div>
 
+      {/* 环形图 + 柱状图 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <GlassPanel>
           <h3 className="text-sm font-semibold text-hermes-text mb-4">{t('stats.status')}</h3>
-          <div className="space-y-3">
-            {STATUSES.map(s => {
-              const count = stats.statusCounts[s.value] || 0;
-              const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
-              const color = s.color.includes('blue') ? 'bg-blue-400' : s.color.includes('amber') ? 'bg-amber-400' : 'bg-emerald-400';
-              return (
-                <div key={s.value}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-hermes-text-muted/70">{t(`status.${s.value}`)}</span>
-                    <span className="text-hermes-gold">{count}</span>
+          <div className="flex items-center gap-4">
+            {/* Donut */}
+            <svg width="100" height="100" viewBox="0 0 36 36" className="flex-shrink-0">
+              {STATUSES.reduce((acc, s, i) => {
+                const count = stats.statusCounts[s.value] || 0;
+                const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
+                const colors = ['#2563eb', '#b45309', '#059669'];
+                const offset = acc.offset;
+                const dash = (pct / 100) * 25.13;
+                acc.elements.push(
+                  <circle key={s.value} cx="18" cy="18" r="15.915" fill="none"
+                    stroke={colors[i]} strokeWidth="3.5" strokeDasharray={`${dash} ${25.13 - dash}`}
+                    strokeDashoffset={offset} strokeLinecap="butt"
+                    transform="rotate(-90 18 18)" style={{ transition: 'stroke-dasharray 0.5s ease' }} />
+                );
+                acc.offset = offset - dash;
+                return acc;
+              }, { offset: 0, elements: [] }).elements}
+            </svg>
+            <div className="flex-1 space-y-2">
+              {STATUSES.map((s, i) => {
+                const count = stats.statusCounts[s.value] || 0;
+                const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
+                const dots = ['bg-blue-400', 'bg-amber-400', 'bg-emerald-400'];
+                return (
+                  <div key={s.value} className="flex items-center gap-2 text-xs">
+                    <span className={`w-2 h-2 rounded-full ${dots[i]} flex-shrink-0`} />
+                    <span className="text-hermes-text-muted/70 flex-1">{t(`status.${s.value}`)}</span>
+                    <span className="text-hermes-gold font-medium">{count}</span>
+                    <span className="text-hermes-text-muted/40 w-8 text-right">{Math.round(pct)}%</span>
                   </div>
-                  <div className="progress-bar"><div style={{ width: `${pct}%`, background: color.replace('bg-', '') }} className="progress-bar-fill" /></div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </GlassPanel>
 
@@ -92,14 +112,15 @@ export default function StatsDashboard({ plugins, t }) {
             {PRIORITIES.map(p => {
               const count = stats.priorityCounts[p.value] || 0;
               const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
-              const color = p.value === 'high' ? 'bg-red-400' : p.value === 'medium' ? 'bg-amber-400' : 'bg-slate-400';
+              const bars = { high: { bg: '#ef4444', w: 'bg-red-400' }, medium: { bg: '#f59e0b', w: 'bg-amber-400' }, low: { bg: '#94a3b8', w: 'bg-slate-400' } };
+              const bar = bars[p.value] || bars.low;
               return (
-                <div key={p.value}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-hermes-text-muted/70">{t(`priority.${p.value}`)}</span>
-                    <span className="text-hermes-gold">{count}</span>
+                <div key={p.value} className="flex items-center gap-3">
+                  <span className="text-xs text-hermes-text-muted/70 w-12 flex-shrink-0">{t(`priority.${p.value}`)}</span>
+                  <div className="flex-1 h-6 bg-hermes-line/50 rounded-sm relative overflow-hidden">
+                    <div className="h-full rounded-sm transition-all duration-500" style={{ width: `${pct}%`, background: bar.bg }} />
                   </div>
-                  <div className="progress-bar"><div style={{ width: `${pct}%`, background: color.replace('bg-', '') }} className="progress-bar-fill" /></div>
+                  <span className="text-xs text-hermes-gold w-8 text-right font-medium">{count}</span>
                 </div>
               );
             })}

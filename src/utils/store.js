@@ -1,6 +1,7 @@
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { uid } from './helpers';
 import { toast } from '../components/Toast';
+import { migrateData, CURRENT_VERSION } from './migrate';
 
 const STORE_KEY = 'mc-plugins-store';
 
@@ -21,7 +22,7 @@ const INITIAL_STORE = {
 
 /** 应用状态 Hook — 所有数据操作集中在此 */
 export function useStore() {
-  const [store, setStore] = useLocalStorage(STORE_KEY, INITIAL_STORE);
+  const [store, setStore] = useLocalStorage(STORE_KEY, { ...INITIAL_STORE, _version: CURRENT_VERSION }, migrateData);
 
   /* ──────── Plugin CRUD ──────── */
 
@@ -181,6 +182,26 @@ export function useStore() {
     ),
   }));
 
+  /* ──────── Releases ──────── */
+
+  const addRelease = (pluginId, release) => setStore(prev => ({
+    ...prev,
+    plugins: prev.plugins.map(p =>
+      p.id === pluginId
+        ? { ...p, releases: [...(p.releases || []), { ...release, id: uid() }], updatedAt: Date.now() }
+        : p
+    ),
+  }));
+
+  const deleteRelease = (pluginId, releaseId) => setStore(prev => ({
+    ...prev,
+    plugins: prev.plugins.map(p =>
+      p.id === pluginId
+        ? { ...p, releases: (p.releases || []).filter(r => r.id !== releaseId), updatedAt: Date.now() }
+        : p
+    ),
+  }));
+
   /* ──────── Tags ──────── */
 
   const addTag = (tag) => setStore(prev => ({
@@ -236,6 +257,8 @@ export function useStore() {
     toggleTask, addTask, deleteTask,
     // Ideas
     addIdea, updateIdea, deleteIdea, addPluginIdea,
+    // Releases
+    addRelease, deleteRelease,
     // Tags
     addTag, removeTag,
     // System
