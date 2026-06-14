@@ -80,25 +80,42 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
 
   const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
   const handleSave = (data) => {
-    editingPlugin ? onUpdatePlugin(editingPlugin.id, data) : onAddPlugin(data);
+    if (!editingPlugin || !editingPlugin.id) {
+      onAddPlugin(data);
+    } else {
+      onUpdatePlugin(editingPlugin.id, data);
+    }
     setEditingPlugin(null);
   };
   const handleClose = () => { setFormOpen(false); setEditingPlugin(null); };
 
   const statusColor = (s) => COL_COLORS[s.value] || 'bg-gray-400';
 
-  /* ── 新建按钮可拖放 ── */
+  /* ── 新建按钮可拖放（支持外部文件拖入） ── */
   function NewPluginDrop() {
     const { setNodeRef, isOver } = useDroppable({ id: 'new-plugin' });
+    const [dragOver, setDragOver] = useState(false);
     return (
       <button
         ref={setNodeRef}
         onClick={() => { setEditingPlugin(null); setFormOpen(true); }}
+        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={e => {
+          e.preventDefault();
+          setDragOver(false);
+          const files = Array.from(e.dataTransfer.files);
+          if (files.length > 0) {
+            const name = files[0].name.replace(/\.[^.]+$/, '');
+            setEditingPlugin({ name });  // 预填文件名
+            setFormOpen(true);
+          }
+        }}
         className={`glass-btn glass-btn-primary flex items-center gap-2 transition-all ${
-          isOver ? 'ring-2 ring-hermes-gold scale-105' : ''
+          isOver || dragOver ? 'ring-2 ring-hermes-gold scale-105' : ''
         }`}
       >
-        <Plus size={16} /> {isOver ? '放入编辑' : t('kanban.new')}
+        <Plus size={16} /> {isOver || dragOver ? '放入编辑' : t('kanban.new')}
       </button>
     );
   }
