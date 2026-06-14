@@ -17,9 +17,8 @@ const NAV_ITEMS = [
 export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, pluginCount }) {
   return (
     <aside
-      className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${
-        collapsed ? 'w-[60px]' : 'w-[220px]'
-      }`}
+      className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${collapsed ? 'w-[60px]' : 'w-[220px]'
+        }`}
     >
       {/* Glass background */}
       <div className="absolute inset-0 sidebar-glass" />
@@ -56,11 +55,10 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, p
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-left ${
-                  isActive
+                className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-left ${isActive
                     ? 'nav-active'
                     : 'nav-inactive'
-                }`}
+                  }`}
                 title={collapsed ? item.label : undefined}
               >
                 <Icon size={18} className="flex-shrink-0" />
@@ -79,7 +77,7 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, p
         {!collapsed && (
           <div className="px-4 mt-auto">
             <p className="text-[10px] text-hermes-text-muted/30 text-center">
-              Hermes · 液态玻璃
+              Plugin Plan
             </p>
           </div>
         )}
