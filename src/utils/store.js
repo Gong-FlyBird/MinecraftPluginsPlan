@@ -1,5 +1,6 @@
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { uid } from './helpers';
+import { toast } from '../components/Toast';
 
 const STORE_KEY = 'mc-plugins-store';
 
@@ -24,16 +25,19 @@ export function useStore() {
 
   /* ──────── Plugin CRUD ──────── */
 
-  const addPlugin = (plugin) => setStore(prev => ({
-    ...prev,
-    plugins: [...prev.plugins, {
-      ...plugin,
-      id: uid(),
-      timeline: [{ action: 'created', detail: '创建插件', timestamp: Date.now() }],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    }],
-  }));
+  const addPlugin = (plugin) => {
+    toast('success', '插件已创建');
+    setStore(prev => ({
+      ...prev,
+      plugins: [...prev.plugins, {
+        ...plugin,
+        id: uid(),
+        timeline: [{ action: 'created', detailKey: 'timeline.created', timestamp: Date.now() }],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }],
+    }));
+  };
 
   const updatePlugin = (id, patch) => setStore(prev => ({
     ...prev,
@@ -41,18 +45,20 @@ export function useStore() {
       p.id === id
         ? { ...p, ...patch, updatedAt: Date.now(), timeline: [
             ...p.timeline,
-            { action: 'updated', detail: patch.name ? `更新: ${patch.name}` : '更新信息', timestamp: Date.now() },
+            { action: 'updated', detailKey: 'timeline.updated', detailParams: { name: patch.name || '' }, timestamp: Date.now() },
           ]}
         : p
     ),
   }));
 
-  const deletePlugin = (id) => setStore(prev => ({
-    ...prev,
-    plugins: prev.plugins.filter(p => p.id !== id),
-    // 同时清理关联的独立灵感
-    standaloneIdeas: prev.standaloneIdeas.filter(idea => idea.pluginId !== id),
-  }));
+  const deletePlugin = (id) => {
+    toast('success', '插件已删除');
+    setStore(prev => ({
+      ...prev,
+      plugins: prev.plugins.filter(p => p.id !== id),
+      standaloneIdeas: prev.standaloneIdeas.filter(idea => idea.pluginId !== id),
+    }));
+  };
 
   const movePluginStatus = (id, newStatus) => setStore(prev => ({
     ...prev,
@@ -60,7 +66,7 @@ export function useStore() {
       p.id === id
         ? { ...p, status: newStatus, updatedAt: Date.now(), timeline: [
             ...p.timeline,
-            { action: 'status', detail: `状态变更 → ${newStatus}`, timestamp: Date.now() },
+            { action: 'status', detailKey: 'timeline.status', detailParams: { status: newStatus }, timestamp: Date.now() },
           ]}
         : p
     ),
@@ -88,14 +94,17 @@ export function useStore() {
     ),
   }));
 
-  const deleteMilestone = (pluginId, milestoneId) => setStore(prev => ({
-    ...prev,
-    plugins: prev.plugins.map(p =>
-      p.id === pluginId
-        ? { ...p, milestones: (p.milestones || []).filter(m => m.id !== milestoneId), updatedAt: Date.now() }
-        : p
-    ),
-  }));
+  const deleteMilestone = (pluginId, milestoneId) => {
+    toast('success', '里程碑已删除');
+    setStore(prev => ({
+      ...prev,
+      plugins: prev.plugins.map(p =>
+        p.id === pluginId
+          ? { ...p, milestones: (p.milestones || []).filter(m => m.id !== milestoneId), updatedAt: Date.now() }
+          : p
+      ),
+    }));
+  };
 
   const toggleTask = (pluginId, milestoneId, taskId) => setStore(prev => ({
     ...prev,
@@ -125,18 +134,21 @@ export function useStore() {
     ),
   }));
 
-  const deleteTask = (pluginId, milestoneId, taskId) => setStore(prev => ({
-    ...prev,
-    plugins: prev.plugins.map(p =>
-      p.id === pluginId
-        ? { ...p, milestones: (p.milestones || []).map(m =>
-            m.id === milestoneId
-              ? { ...m, tasks: (m.tasks || []).filter(t => t.id !== taskId) }
-              : m
-          ), updatedAt: Date.now() }
-        : p
-    ),
-  }));
+  const deleteTask = (pluginId, milestoneId, taskId) => {
+    toast('success', '任务已删除');
+    setStore(prev => ({
+      ...prev,
+      plugins: prev.plugins.map(p =>
+        p.id === pluginId
+          ? { ...p, milestones: (p.milestones || []).map(m =>
+              m.id === milestoneId
+                ? { ...m, tasks: (m.tasks || []).filter(t => t.id !== taskId) }
+                : m
+            ), updatedAt: Date.now() }
+          : p
+      ),
+    }));
+  };
 
   /* ──────── Ideas ──────── */
 
@@ -152,10 +164,13 @@ export function useStore() {
     ),
   }));
 
-  const deleteIdea = (id) => setStore(prev => ({
-    ...prev,
-    standaloneIdeas: prev.standaloneIdeas.filter(idea => idea.id !== id),
-  }));
+  const deleteIdea = (id) => {
+    toast('success', '灵感已删除');
+    setStore(prev => ({
+      ...prev,
+      standaloneIdeas: prev.standaloneIdeas.filter(idea => idea.id !== id),
+    }));
+  };
 
   const addPluginIdea = (pluginId, idea) => setStore(prev => ({
     ...prev,
@@ -173,14 +188,17 @@ export function useStore() {
     tags: prev.tags.some(t => t.name === tag.name) ? prev.tags : [...prev.tags, { ...tag, id: uid() }],
   }));
 
-  const removeTag = (tagName) => setStore(prev => ({
-    ...prev,
-    tags: prev.tags.filter(t => t.name !== tagName),
-    plugins: prev.plugins.map(p => ({
-      ...p,
-      tags: (p.tags || []).filter(t => t !== tagName),
-    })),
-  }));
+  const removeTag = (tagName) => {
+    toast('success', `标签「${tagName}」已删除`);
+    setStore(prev => ({
+      ...prev,
+      tags: prev.tags.filter(t => t.name !== tagName),
+      plugins: prev.plugins.map(p => ({
+        ...p,
+        tags: (p.tags || []).filter(t => t !== tagName),
+      })),
+    }));
+  };
 
   /* ──────── 设置 ──────── */
 
@@ -192,6 +210,8 @@ export function useStore() {
   /* ──────── 全局 ──────── */
 
   const importStore = (data) => {
+    const count = data.plugins?.length || 0;
+    toast('success', `已导入 ${count} 个插件`);
     setStore({
       ...INITIAL_STORE,
       ...data,
@@ -201,7 +221,10 @@ export function useStore() {
     });
   };
 
-  const resetStore = () => setStore(INITIAL_STORE);
+  const resetStore = () => {
+    toast('success', '数据已重置');
+    setStore(INITIAL_STORE);
+  };
 
   return {
     store,

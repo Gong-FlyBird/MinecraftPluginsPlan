@@ -12,12 +12,15 @@ import SprintBoard from './components/SprintBoard';
 import TagManager from './components/TagManager';
 import SettingsPanel from './components/SettingsPanel';
 import Modal from './components/Modal';
+import ToastContainer, { toast } from './components/Toast';
+import GlobalSearch from './components/GlobalSearch';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('kanban');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedPluginId, setSelectedPluginId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const hideTimer = useRef(null);
 
@@ -89,6 +92,29 @@ export default function App() {
     ? (sidebarVisible ? (sidebarCollapsed ? '60px' : '220px') : '0px')
     : (sidebarCollapsed ? '60px' : '220px');
 
+  // ── 键盘快捷键 ──
+  useEffect(() => {
+    const handleKey = (e) => {
+      // Ctrl+N / ⌘+N → 切换到看板并打开新建
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        setActiveTab('kanban');
+      }
+      // Ctrl+F / ⌘+F → 聚焦搜索（触发看板的搜索）
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        // 触发全局搜索弹窗
+        setGlobalSearchOpen(true);
+      }
+      // Escape → 关闭设置
+      if (e.key === 'Escape' && settingsOpen) {
+        setSettingsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [settingsOpen]);
+
   return (
     <div className="min-h-screen">
       {/* Background Orbs */}
@@ -117,6 +143,16 @@ export default function App() {
         autoHide={autoHide}
         onMouseEnter={handleSidebarEnter}
         onMouseLeave={handleSidebarLeave}
+      />
+
+      <ToastContainer />
+
+      {/* Global Search */}
+      <GlobalSearch
+        open={globalSearchOpen}
+        onClose={() => setGlobalSearchOpen(false)}
+        plugins={plugins}
+        t={t}
       />
 
       {/* Settings Modal */}

@@ -62,7 +62,7 @@ export default function TimelineView({ plugins, t }) {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <span className="text-sm font-medium text-hermes-text">{evt.pluginName}</span>
-                      <span className="text-sm text-hermes-text-muted/70 ml-2">{evt.detail || ''}</span>
+                      <span className="text-sm text-hermes-text-muted/70 ml-2">{evt.detailKey ? t(evt.detailKey, evt.detailParams || {}) : evt.detail || ''}</span>
                     </div>
                     <span className="text-[10px] text-hermes-text-muted/40 whitespace-nowrap" title={formatDateTime(evt.timestamp)}>
                       {timeAgo(evt.timestamp, t)}
