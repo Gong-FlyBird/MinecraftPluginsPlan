@@ -20,7 +20,8 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, t }
   }, [plugins]);
 
   const handleSubmit = () => {
-    if (!form.pluginId || !form.version) return;
+    if (!form.pluginId) { alert('请选择插件'); return; }
+    if (!form.version) return;
     onAddRelease(form.pluginId, {
       version: form.version,
       title: form.title || `v${form.version}`,
