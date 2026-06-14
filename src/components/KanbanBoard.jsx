@@ -19,7 +19,7 @@ const COL_COLORS = {
   released: 'bg-emerald-400',
 };
 
-export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveStatus, onMoveTo, onReorder, t }) {
+export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveStatus, onMoveTo, onReorder, t, onExternalDrop }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState(null);
   const [activeId, setActiveId] = useState(null);
@@ -117,7 +117,21 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex flex-col md:flex-row gap-4 items-start">
           {columns.map(col => (
-            <div key={col.value} className="flex-1 glass p-4 min-h-[200px] shrink-0">
+            <div
+              key={col.value}
+              onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }}
+              onDrop={e => {
+                e.preventDefault();
+                const files = Array.from(e.dataTransfer.files);
+                files.forEach(f => {
+                  const name = f.name.replace(/\.[^.]+$/, ''); // 去掉扩展名
+                  onExternalDrop?.(name, col.value);
+                });
+              }}
+              className={`flex-1 glass p-4 min-h-[200px] shrink-0 transition-all ${
+                false ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/5' : ''
+              }`}
+            >
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-hermes-border/30">
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full ${statusColor(col)}`} />

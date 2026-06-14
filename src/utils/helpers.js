@@ -63,6 +63,7 @@ export const STATUSES = [
 ];
 
 export const PRIORITIES = [
+  { value: 'external', label: '外部', color: 'text-purple-400' },
   { value: 'low', label: '低', color: 'text-slate-400' },
   { value: 'medium', label: '中', color: 'text-amber-400' },
   { value: 'high', label: '高', color: 'text-red-400' },

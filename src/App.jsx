@@ -83,6 +83,12 @@ export default function App() {
     }
   };
 
+  /** 从外部拖入文件创建插件 */
+  const handleExternalDrop = (name, status) => {
+    addPlugin({ name, status, priority: 'external' });
+    toast('success', `已从外部导入：${name}`);
+  };
+
   // ── 自动隐藏侧边栏 ──
   const handleSidebarEnter = useCallback(() => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -206,6 +212,7 @@ export default function App() {
               onMoveStatus={movePluginStatus}
               onMoveTo={movePluginTo}
               onReorder={reorderPlugins}
+              onExternalDrop={handleExternalDrop}
               t={t}
             />
           )}

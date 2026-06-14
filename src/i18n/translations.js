@@ -218,6 +218,7 @@ const zh = {
   'status.released': '已发布',
 
   /* ── 优先级 ── */
+  'priority.external': '外部',
   'priority.high': '高',
   'priority.medium': '中',
   'priority.low': '低',
@@ -411,6 +412,7 @@ const en = {
   'status.released': 'Released',
 
   'priority.high': 'High',
+  'priority.external': 'External',
   'priority.medium': 'Medium',
   'priority.low': 'Low',
 
@@ -600,6 +602,7 @@ const ja = {
   'status.developing': '開発中',
   'status.released': '公開済み',
 
+  'priority.external': '外部',
   'priority.high': '高',
   'priority.medium': '中',
   'priority.low': '低',
