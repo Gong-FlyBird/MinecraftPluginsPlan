@@ -18,9 +18,11 @@ export default function SettingsPanel({ settings, onUpdate, t }) {
               }`}
             >
               <div className="flex justify-center gap-1.5 mb-2">
-                <span className="w-4 h-4 rounded-sm border border-hermes-border" style={{ background: th.id === 'gold' ? '#f6f2ea' : th.id === 'ivory' ? '#f5f0e8' : '#eef0f2' }} />
+                <span className="w-4 h-4 rounded-sm border border-hermes-border" style={{
+                  background: th.id === 'gold' ? '#f6f2ea' : th.id === 'ivory' ? '#f5f0e8' : th.id === 'slate' ? '#eef0f2' : th.id === 'noir' ? '#1a1a1e' : '#eef3ec'
+                }} />
                 <span className="w-4 h-4 rounded-sm" style={{
-                  background: th.id === 'gold' ? '#c9a94e' : th.id === 'ivory' ? '#b8956a' : '#6b7280'
+                  background: th.id === 'gold' ? '#c9a94e' : th.id === 'ivory' ? '#b8956a' : th.id === 'slate' ? '#6b7280' : th.id === 'noir' ? '#c9a94e' : '#7a9a7a'
                 }} />
               </div>
               <span>{th.label[t.code] || th.label.zh}</span>

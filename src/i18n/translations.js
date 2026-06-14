@@ -5,18 +5,26 @@ export const LANGUAGES = [
 ];
 
 export const THEMES = [
-  { id: 'gold', label: { zh: 'Hermès 金', en: 'Hermès Gold', ja: 'エルメスゴールド' } },
-  { id: 'ivory', label: { zh: 'Hermès 象牙', en: 'Hermès Ivory', ja: 'エルメスアイボリー' } },
-  { id: 'slate', label: { zh: 'Hermès 石板', en: 'Hermès Slate', ja: 'エルメススレート' } },
+  { id: 'gold',   label: { zh: 'Hermès 金',    en: 'Hermès Gold',   ja: 'エルメスゴールド' } },
+  { id: 'ivory',  label: { zh: 'Hermès 象牙',   en: 'Hermès Ivory',  ja: 'エルメスアイボリー' } },
+  { id: 'slate',  label: { zh: 'Hermès 石板',   en: 'Hermès Slate',  ja: 'エルメススレート' } },
+  { id: 'noir',   label: { zh: 'Hermès 夜',     en: 'Hermès Noir',   ja: 'エルメスノワール' } },
+  { id: 'sage',   label: { zh: 'Hermès 鼠尾草', en: 'Hermès Sage',   ja: 'エルメスセージ' } },
 ];
 
 export const ACCENTS = [
-  { id: 'gold', label: { zh: '金色', en: 'Gold', ja: 'ゴールド' }, color: '#c9a94e' },
-  { id: 'orange', label: { zh: '橙色', en: 'Orange', ja: 'オレンジ' }, color: '#e8772e' },
-  { id: 'rose', label: { zh: '玫瑰金', en: 'Rose', ja: 'ローズ' }, color: '#d47383' },
-  { id: 'blue', label: { zh: '藏蓝', en: 'Navy', ja: 'ネイビー' }, color: '#4a7db5' },
-  { id: 'green', label: { zh: '翡翠绿', en: 'Jade', ja: 'ジェイド' }, color: '#5b8c6f' },
-  { id: 'silver', label: { zh: '银灰', en: 'Silver', ja: 'シルバー' }, color: '#8a8a8a' },
+  { id: 'gold',    label: { zh: '金色',     en: 'Gold',    ja: 'ゴールド' },   color: '#c9a94e' },
+  { id: 'orange',  label: { zh: '橙色',     en: 'Orange',  ja: 'オレンジ' },   color: '#e8772e' },
+  { id: 'rose',    label: { zh: '玫瑰金',   en: 'Rose',    ja: 'ローズ' },     color: '#d47383' },
+  { id: 'ruby',    label: { zh: '红宝石',   en: 'Ruby',    ja: 'ルビー' },     color: '#d43370' },
+  { id: 'coral',   label: { zh: '珊瑚',     en: 'Coral',   ja: 'コーラル' },   color: '#e8927c' },
+  { id: 'blue',    label: { zh: '藏蓝',     en: 'Navy',    ja: 'ネイビー' },   color: '#4a7db5' },
+  { id: 'teal',    label: { zh: '青碧',     en: 'Teal',    ja: 'ティール' },   color: '#4a9d8f' },
+  { id: 'green',   label: { zh: '翡翠绿',   en: 'Jade',    ja: 'ジェイド' },   color: '#5b8c6f' },
+  { id: 'sage',    label: { zh: '鼠尾草绿', en: 'Sage',    ja: 'セージ' },     color: '#7a9a7a' },
+  { id: 'silver',  label: { zh: '银灰',     en: 'Silver',  ja: 'シルバー' },   color: '#8a8a8a' },
+  { id: 'bronze',  label: { zh: '青铜',     en: 'Bronze',  ja: 'ブロンズ' },   color: '#a67d4a' },
+  { id: 'champagne', label: { zh: '香槟金', en: 'Champagne', ja: 'シャンパン' }, color: '#d4b896' },
 ];
 
 export const CORNERS = [
