@@ -1,0 +1,367 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ════════════════════════════════════════
+   「金色时刻」 — Hermes 亮色 · 液态玻璃
+   暖白基底 · 金色点缀 · 琥珀深色
+   ════════════════════════════════════════ */
+
+@layer base {
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    background: #f6f2ea;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #f6f2ea;
+    color: #1a1612;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: #1a1612;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: rgba(201, 169, 78, 0.15);
+    color: #1a1612;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(201,169,78,0.2); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(201,169,78,0.35); }
+
+  input, textarea, select { font-family: inherit; }
+}
+
+@layer components {
+  /* ── 玻璃氛围 ── */
+  .glass {
+    background: rgba(253, 251, 248, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(232, 224, 212, 0.4);
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(26,22,18,0.02);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(232, 224, 212, 0.3);
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(26,22,18,0.02);
+    transition: all 0.25s ease;
+  }
+
+  .glass-card:hover {
+    border-color: rgba(201, 169, 78, 0.2);
+    box-shadow: 0 6px 24px rgba(26,22,18,0.05), 0 0 0 1px rgba(201,169,78,0.05);
+    transform: translateY(-2px);
+  }
+
+  .glass-card-header {
+    border-bottom: 1px solid rgba(232, 224, 212, 0.4);
+  }
+
+  /* ── 看板列 ── */
+  .kanban-column {
+    background: rgba(253, 251, 248, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(232, 224, 212, 0.25);
+    border-radius: 14px;
+  }
+
+  /* ── 侧边栏 ── */
+  .sidebar-glass {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-right: 1px solid rgba(232, 224, 212, 0.5);
+  }
+
+  /* ── 输入框 ── */
+  .glass-input {
+    background: #ffffff;
+    border: 1px solid #e8e0d4;
+    border-radius: 10px;
+    color: #1a1612;
+    padding: 10px 14px;
+    outline: none;
+    transition: all 0.2s ease;
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .glass-input:focus {
+    border-color: #c9a94e;
+    box-shadow: 0 0 0 3px rgba(201, 169, 78, 0.08);
+  }
+
+  .glass-input::placeholder {
+    color: #c0b8a8;
+  }
+
+  /* ── 按钮 ── */
+  .glass-btn {
+    background: #ffffff;
+    border: 1px solid #e8e0d4;
+    border-radius: 10px;
+    color: #1a1612;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+  }
+
+  .glass-btn:hover {
+    border-color: #d0c8b8;
+    box-shadow: 0 2px 8px rgba(26,22,18,0.04);
+    transform: translateY(-1px);
+  }
+
+  .glass-btn:active {
+    transform: translateY(0);
+  }
+
+  /* 主按钮 — 金色 */
+  .glass-btn-primary {
+    background: linear-gradient(135deg, #c9a94e, #d4b45a);
+    border-color: #c9a94e;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .glass-btn-primary:hover {
+    background: linear-gradient(135deg, #d4b45a, #e0c86a);
+    border-color: #d4b45a;
+    box-shadow: 0 4px 16px rgba(201,169,78,0.2);
+    color: #fff;
+  }
+
+  .glass-btn-primary:active {
+    background: #b8983e;
+    border-color: #b8983e;
+  }
+
+  /* 次要按钮 */
+  .glass-btn-secondary {
+    background: #fff;
+    border-color: #c9a94e;
+    color: #a8882e;
+  }
+
+  .glass-btn-secondary:hover {
+    background: rgba(201,169,78,0.05);
+    border-color: #c9a94e;
+    color: #8a6e1e;
+  }
+
+  /* 危险 */
+  .glass-btn-danger {
+    background: #fff;
+    border-color: #e8e0d4;
+    color: #b91c1c;
+  }
+
+  .glass-btn-danger:hover {
+    border-color: #ef4444;
+    background: rgba(239,68,68,0.04);
+    color: #991b1b;
+  }
+
+  /* 选择框 */
+  .glass-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c9a94e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  .glass-select option { background: #fff; color: #1a1612; }
+
+  /* ── 标签 ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    border: 1px solid #e8e0d4;
+    background: #fff;
+    color: #8a8070;
+    text-transform: uppercase;
+  }
+
+  .tag-status-planning {
+    color: #2563eb;
+    border-color: rgba(37,99,235,0.15);
+    background: rgba(37,99,235,0.04);
+  }
+  .tag-status-developing {
+    color: #b45309;
+    border-color: rgba(180,83,9,0.15);
+    background: rgba(180,83,9,0.04);
+  }
+  .tag-status-released {
+    color: #059669;
+    border-color: rgba(5,150,105,0.15);
+    background: rgba(5,150,105,0.04);
+  }
+
+  /* ── 进度条 ── */
+  .progress-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: #ece8e0;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #c9a94e, #e0c86a);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ── 动画 ── */
+  .fade-in  { animation: fadeIn 0.3s ease-out; }
+  .slide-up { animation: slideUp 0.3s ease-out; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Modal 背景 ── */
+  .modal-overlay {
+    background: rgba(26, 22, 18, 0.15);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* ── 拖拽 ── */
+  .dragging {
+    opacity: 0.35;
+    transform: scale(0.95);
+  }
+  .drag-over {
+    border-color: #c9a94e !important;
+    background: rgba(201,169,78,0.04) !important;
+  }
+
+  /* ── 时间线 ── */
+  .timeline-line { position: relative; }
+  .timeline-line::before {
+    content: '';
+    position: absolute;
+    left: 11px; top: 28px; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, rgba(201,169,78,0.3), rgba(201,169,78,0.02));
+  }
+  .timeline-line:last-child::before { display: none; }
+
+  /* ── 代码块 ── */
+  .code-snippet {
+    background: #faf8f4;
+    border: 1px solid #e8e0d4;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    color: #5a5040;
+  }
+
+  /* ── Checkbox ── */
+  .glass-checkbox {
+    appearance: none;
+    width: 18px; height: 18px;
+    border: 1.5px solid #d8d0c4;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .glass-checkbox:checked {
+    background: #c9a94e;
+    border-color: #c9a94e;
+  }
+  .glass-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 2px;
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .glass-checkbox:hover {
+    border-color: #c9a94e;
+  }
+
+  /* ── 背景光晕 ── */
+  .bg-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    z-index: -1;
+  }
+  .bg-orb-1 {
+    width: 500px; height: 500px;
+    background: rgba(201,169,78,0.06);
+    top: -150px; right: -80px;
+  }
+  .bg-orb-2 {
+    width: 400px; height: 400px;
+    background: rgba(201,169,78,0.04);
+    bottom: -100px; left: -80px;
+  }
+  .bg-orb-3 {
+    width: 600px; height: 600px;
+    background: rgba(212,148,58,0.03);
+    top: 30%; left: 60%;
+    transform: translate(-50%,-50%);
+  }
+
+  /* ── 导航状态 ── */
+  .nav-active {
+    background: rgba(201, 169, 78, 0.08) !important;
+    border-color: rgba(201, 169, 78, 0.2) !important;
+    color: #a8882e !important;
+  }
+  .nav-inactive {
+    color: rgba(26, 22, 18, 0.45);
+    border-color: transparent;
+  }
+  .nav-inactive:hover {
+    color: #1a1612;
+    background: rgba(26, 22, 18, 0.02);
+  }
+}
