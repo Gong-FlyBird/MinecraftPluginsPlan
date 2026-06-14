@@ -239,6 +239,28 @@ export function useStore() {
     ),
   }));
 
+  const updateRelease = (pluginId, releaseId, patch) => setStore(prev => ({
+    ...prev,
+    plugins: prev.plugins.map(p =>
+      p.id === pluginId
+        ? { ...p, releases: (p.releases || []).map(r =>
+            r.id === releaseId ? { ...r, ...patch } : r
+          ), updatedAt: Date.now() }
+        : p
+    ),
+  }));
+
+  const pinRelease = (pluginId, releaseId) => setStore(prev => ({
+    ...prev,
+    plugins: prev.plugins.map(p =>
+      p.id === pluginId
+        ? { ...p, releases: (p.releases || []).map(r =>
+            r.id === releaseId ? { ...r, pinned: !r.pinned } : r
+          ), updatedAt: Date.now() }
+        : p
+    ),
+  }));
+
   /* ──────── Tags ──────── */
 
   const addTag = (tag) => setStore(prev => ({
@@ -295,7 +317,7 @@ export function useStore() {
     // Ideas
     addIdea, updateIdea, deleteIdea, addPluginIdea,
     // Releases
-    addRelease, deleteRelease,
+    addRelease, deleteRelease, updateRelease, pinRelease,
     // Tags
     addTag, removeTag,
     // System

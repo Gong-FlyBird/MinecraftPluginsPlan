@@ -31,7 +31,7 @@ export default function App() {
     addMilestone, updateMilestone, deleteMilestone,
     toggleTask, addTask, deleteTask,
     addIdea, updateIdea, deleteIdea, addPluginIdea,
-    addRelease, deleteRelease,
+    addRelease, deleteRelease, updateRelease, pinRelease,
     addTag, removeTag,
     importStore, resetStore,
     updateSettings,
@@ -269,6 +269,8 @@ export default function App() {
               plugins={plugins}
               onAddRelease={addRelease}
               onDeleteRelease={deleteRelease}
+              onUpdateRelease={updateRelease}
+              onPinRelease={pinRelease}
               t={t}
             />
           )}
