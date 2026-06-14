@@ -47,7 +47,9 @@ export default function Sidebar({
         {/* Toggle Button */}
         <button
           onClick={onToggle}
-          className="absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10"
+          className={`absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10 ${
+            autoHide && !visible ? 'opacity-0 pointer-events-none' : ''
+          }`}
         >
           <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
         </button>
