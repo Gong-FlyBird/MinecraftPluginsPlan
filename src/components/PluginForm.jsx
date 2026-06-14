@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Upload } from 'lucide-react';
 import Modal from './Modal';
 import { STATUSES, PRIORITIES } from '../utils/helpers';
 import { useT } from '../utils/i18n';
@@ -12,21 +13,25 @@ export default function PluginForm({ open, onClose, onSave, plugin, t: propT }) 
     status: 'planning', priority: 'medium',
     tags: '', description: '', changelog: '',
   });
+  const [dropOver, setDropOver] = useState(false);
 
   useEffect(() => {
-    if (plugin) {
-      setForm({
-        name: plugin.name || '',
-        version: plugin.version || '1.0.0',
-        mcVersion: plugin.mcVersion || '1.20.4',
-        status: plugin.status || 'planning',
-        priority: plugin.priority || 'medium',
-        tags: (plugin.tags || []).join(', '),
-        description: plugin.description || '',
-        changelog: plugin.changelog || '',
-      });
-    } else {
-      setForm({ name: '', version: '1.0.0', mcVersion: '1.20.4', status: 'planning', priority: 'medium', tags: '', description: '', changelog: '' });
+    if (open) {
+      if (plugin) {
+        setForm({
+          name: plugin.name || '',
+          version: plugin.version || '1.0.0',
+          mcVersion: plugin.mcVersion || '1.20.4',
+          status: plugin.status || 'planning',
+          priority: plugin.priority || 'medium',
+          tags: (plugin.tags || []).join(', '),
+          description: plugin.description || '',
+          changelog: plugin.changelog || '',
+        });
+      } else {
+        setForm({ name: '', version: '1.0.0', mcVersion: '1.20.4', status: 'planning', priority: 'medium', tags: '', description: '', changelog: '' });
+      }
+      setDropOver(false);
     }
   }, [plugin, open]);
 
@@ -42,9 +47,34 @@ export default function PluginForm({ open, onClose, onSave, plugin, t: propT }) 
     onClose();
   };
 
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDropOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      const name = files[0].name.replace(/\.[^.]+$/, '');
+      setForm(prev => ({ ...prev, name }));
+    }
+  };
+
   return (
     <Modal open={open} onClose={onClose} title={isEdit ? t('plugin.edit') : t('plugin.new')}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* 拖入区 */}
+        <div
+          onDragOver={e => { e.preventDefault(); setDropOver(true); }}
+          onDragLeave={() => setDropOver(false)}
+          onDrop={handleDrop}
+          className={`border-2 border-dashed rounded-sm p-3 text-center transition-all cursor-default ${
+            dropOver ? 'border-hermes-gold bg-hermes-gold/5 scale-[1.01]' : 'border-hermes-border/30 hover:border-hermes-border/60'
+          }`}
+        >
+          <Upload size={18} className={`mx-auto mb-1 ${dropOver ? 'text-hermes-gold' : 'text-hermes-text-muted/30'}`} />
+          <p className="text-[11px] text-hermes-text-muted/40">
+            {dropOver ? '松开自动填入插件名' : '拖入文件自动填入插件名'}
+          </p>
+        </div>
+
         <div>
           <label className="block text-sm text-hermes-text-muted mb-1.5">{t('plugin.name')} *</label>
           <input type="text" value={form.name} onChange={e => handleChange('name', e.target.value)}

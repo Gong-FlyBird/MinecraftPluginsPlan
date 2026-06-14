@@ -7,7 +7,7 @@ import {
   SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import PluginCard from './PluginCard';
 import PluginForm from './PluginForm';
 import EmptyState from './EmptyState';
@@ -19,6 +19,87 @@ const COL_COLORS = {
   released: 'bg-emerald-400',
 };
 
+/* ── 单个看板列（独立组件才能用 Hook） ── */
+function KanbanColumn({ col, onEdit, onDelete, onReorder, onExternalDrop, t, statusColor }) {
+  const { setNodeRef, isOver } = useDroppable({ id: col.value });
+  const [extDragOver, setExtDragOver] = useState(false);
+
+  return (
+    <div
+      ref={setNodeRef}
+      onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setExtDragOver(true); }}
+      onDragLeave={() => setExtDragOver(false)}
+      onDrop={e => {
+        e.preventDefault();
+        setExtDragOver(false);
+        const files = Array.from(e.dataTransfer.files);
+        files.forEach(f => {
+          const name = f.name.replace(/\.[^.]+$/, '');
+          onExternalDrop?.(name, col.value);
+        });
+      }}
+      className={`flex-1 glass p-4 min-h-[200px] shrink-0 transition-all ${
+        isOver ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/5'
+        : extDragOver ? 'ring-2 ring-purple-400/40 bg-purple-400/5'
+        : ''
+      }`}
+    >
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-hermes-border/30">
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${statusColor(col)}`} />
+          <h3 className="text-sm font-semibold text-hermes-text">{t(`kanban.${col.value}`)}</h3>
+        </div>
+        <span className="text-xs text-hermes-text-muted/50 bg-hermes-gold/8 px-2 py-0.5">
+          {col.items.length}
+        </span>
+      </div>
+
+      {col.items.length === 0 ? (
+        <div className="text-center py-8 text-xs text-hermes-text-muted/40">{t('kanban.drop')}</div>
+      ) : (
+        <SortableContext items={col.items.map(p => p.id)} strategy={verticalListSortingStrategy}>
+          {col.items.map(plugin => (
+            <PluginCard key={plugin.id} plugin={plugin}
+              onEdit={onEdit} onDelete={onDelete} t={t} />
+          ))}
+        </SortableContext>
+      )}
+    </div>
+  );
+}
+
+/* ── 新建按钮（独立组件才能用 Hook） ── */
+function NewPluginDrop({ onOpen, onDropFile, t }) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'new-plugin' });
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      const name = files[0].name.replace(/\.[^.]+$/, '');
+      onDropFile(name);
+    }
+  };
+
+  return (
+    <button
+      ref={setNodeRef}
+      onClick={onOpen}
+      onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={() => setDragOver(false)}
+      onDrop={handleDrop}
+      className={`glass-btn glass-btn-primary flex items-center gap-2 transition-all ${
+        isOver || dragOver ? 'ring-2 ring-hermes-gold scale-105' : ''
+      }`}
+    >
+      <Plus size={16} /> {isOver || dragOver ? '放入编辑' : t('kanban.new')}
+    </button>
+  );
+}
+
+/* ── 看板主组件 ── */
 export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveStatus, onMoveTo, onReorder, t, onExternalDrop }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState(null);
@@ -78,6 +159,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     onMoveTo?.(active.id, toCol.value, overIdx >= 0 ? overIdx : 999);
   }, [columns, plugins, onMoveTo, onReorder]);
 
+  const openNew = () => { setEditingPlugin(null); setFormOpen(true); };
   const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
   const handleSave = (data) => {
     if (!editingPlugin || !editingPlugin.id) {
@@ -88,37 +170,12 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     setEditingPlugin(null);
   };
   const handleClose = () => { setFormOpen(false); setEditingPlugin(null); };
+  const handleExternalFileOnNew = (name) => {
+    setEditingPlugin({ name });
+    setFormOpen(true);
+  };
 
   const statusColor = (s) => COL_COLORS[s.value] || 'bg-gray-400';
-
-  /* ── 新建按钮可拖放（支持外部文件拖入） ── */
-  function NewPluginDrop() {
-    const { setNodeRef, isOver } = useDroppable({ id: 'new-plugin' });
-    const [dragOver, setDragOver] = useState(false);
-    return (
-      <button
-        ref={setNodeRef}
-        onClick={() => { setEditingPlugin(null); setFormOpen(true); }}
-        onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={e => {
-          e.preventDefault();
-          setDragOver(false);
-          const files = Array.from(e.dataTransfer.files);
-          if (files.length > 0) {
-            const name = files[0].name.replace(/\.[^.]+$/, '');
-            setEditingPlugin({ name });  // 预填文件名
-            setFormOpen(true);
-          }
-        }}
-        className={`glass-btn glass-btn-primary flex items-center gap-2 transition-all ${
-          isOver || dragOver ? 'ring-2 ring-hermes-gold scale-105' : ''
-        }`}
-      >
-        <Plus size={16} /> {isOver || dragOver ? '放入编辑' : t('kanban.new')}
-      </button>
-    );
-  }
 
   return (
     <div className="fade-in">
@@ -127,57 +184,24 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           <h1 className="text-2xl font-bold text-hermes-text">{t('kanban.title')}</h1>
           <p className="text-sm text-hermes-text-muted/60 mt-1">{t('kanban.subtitle')}</p>
         </div>
-        <NewPluginDrop />
+        <NewPluginDrop onOpen={openNew} onDropFile={handleExternalFileOnNew} t={t} />
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCorners}
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex flex-col md:flex-row gap-4 items-start">
-          {columns.map(col => {
-            const { setNodeRef, isOver } = useDroppable({ id: col.value });
-            const [extDragOver, setExtDragOver] = useState(false);
-            return (
-            <div
+          {columns.map(col => (
+            <KanbanColumn
               key={col.value}
-              ref={setNodeRef}
-              onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setExtDragOver(true); }}
-              onDragLeave={() => setExtDragOver(false)}
-              onDrop={e => {
-                e.preventDefault();
-                setExtDragOver(false);
-                const files = Array.from(e.dataTransfer.files);
-                files.forEach(f => {
-                  const name = f.name.replace(/\.[^.]+$/, '');
-                  onExternalDrop?.(name, col.value);
-                });
-              }}
-              className={`flex-1 glass p-4 min-h-[200px] shrink-0 transition-all ${
-                isOver ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/5' : extDragOver ? 'ring-2 ring-purple-400/40 bg-purple-400/5' : ''
-              }`}
-            >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-hermes-border/30">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${statusColor(col)}`} />
-                  <h3 className="text-sm font-semibold text-hermes-text">{t(`kanban.${col.value}`)}</h3>
-                </div>
-                <span className="text-xs text-hermes-text-muted/50 bg-hermes-gold/8 px-2 py-0.5">
-                  {col.items.length}
-                </span>
-              </div>
-
-              {col.items.length === 0 ? (
-                <div className="text-center py-8 text-xs text-hermes-text-muted/40">{t('kanban.drop')}</div>
-              ) : (
-                <SortableContext items={col.items.map(p => p.id)} strategy={verticalListSortingStrategy}>
-                  {col.items.map(plugin => (
-                    <PluginCard key={plugin.id} plugin={plugin}
-                      onEdit={handleEdit} onDelete={onDeletePlugin} t={t} />
-                  ))}
-                </SortableContext>
-              )}
-            </div>
-            );
-          })}
+              col={col}
+              onEdit={handleEdit}
+              onDelete={onDeletePlugin}
+              onReorder={onReorder}
+              onExternalDrop={onExternalDrop}
+              t={t}
+              statusColor={statusColor}
+            />
+          ))}
         </div>
 
         <DragOverlay>
@@ -194,8 +218,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           title={t('timeline.empty')}
           description={t('stats.empty')}
           action={
-            <button onClick={() => { setEditingPlugin(null); setFormOpen(true); }}
-              className="glass-btn glass-btn-primary flex items-center gap-2 mx-auto">
+            <button onClick={openNew} className="glass-btn glass-btn-primary flex items-center gap-2 mx-auto">
               <Plus size={16} /> {t('kanban.new')}
             </button>
           }
