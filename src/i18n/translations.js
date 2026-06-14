@@ -200,6 +200,7 @@ const zh = {
   'settings.corner': '边角风格',
   'settings.language': '语言',
   'settings.sprintDays': '冲刺天数',
+  'settings.autoHide': '自动隐藏侧边栏',
 
   /* ── 状态 ── */
   'status.planning': '计划中',
@@ -391,6 +392,7 @@ const en = {
   'settings.corner': 'Corner Style',
   'settings.language': 'Language',
   'settings.sprintDays': 'Sprint Days',
+  'settings.autoHide': 'Auto-hide Sidebar',
 
   'status.planning': 'Planning',
   'status.developing': 'Developing',
@@ -578,6 +580,7 @@ const ja = {
   'settings.corner': '角のスタイル',
   'settings.language': '言語',
   'settings.sprintDays': 'スプリント日数',
+  'settings.autoHide': 'サイドバー自動非表示',
 
   'status.planning': '計画中',
   'status.developing': '開発中',

@@ -14,6 +14,7 @@ const INITIAL_STORE = {
     accent: 'gold',
     corner: 'square',
     language: 'zh',
+    autoHide: false,
   },
 };
 

@@ -84,6 +84,30 @@ export default function SettingsPanel({ settings, onUpdate, t }) {
           ))}
         </div>
       </div>
+
+      {/* ── 自动隐藏侧边栏 ── */}
+      <div className="border-t border-hermes-border/30 pt-4">
+        <label className="flex items-center justify-between cursor-pointer">
+          <div>
+            <span className="text-sm font-semibold text-hermes-text">{t('settings.autoHide')}</span>
+            <p className="text-[11px] text-hermes-text-muted/50 mt-0.5">
+              {s.autoHide ? '鼠标移至屏幕左侧边缘显示' : '侧边栏始终固定显示'}
+            </p>
+          </div>
+          <button
+            onClick={() => onUpdate({ autoHide: !s.autoHide })}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+              s.autoHide ? 'bg-hermes-gold' : 'bg-hermes-border'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-200 ${
+                s.autoHide ? 'translate-x-5' : ''
+              }`}
+            />
+          </button>
+        </label>
+      </div>
     </div>
   );
 }

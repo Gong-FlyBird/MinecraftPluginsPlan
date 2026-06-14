@@ -1,5 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Settings } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useStore } from './utils/store';
 import { useT } from './utils/i18n';
 import Sidebar from './components/Sidebar';
@@ -19,6 +18,8 @@ export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedPluginId, setSelectedPluginId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const hideTimer = useRef(null);
 
   const {
     store, addPlugin, updatePlugin, deletePlugin, movePluginStatus,
@@ -33,6 +34,7 @@ export default function App() {
   const settings = store.settings || {};
   const lang = settings.language || 'zh';
   const t = useT(lang);
+  const autoHide = settings.autoHide || false;
 
   // ── 同步主题类名到 <html> ──
   useEffect(() => {
@@ -68,7 +70,24 @@ export default function App() {
     }
   };
 
-  const sidebarWidth = sidebarCollapsed ? '60px' : '220px';
+  // ── 自动隐藏侧边栏 ──
+  const handleSidebarEnter = useCallback(() => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    setSidebarVisible(true);
+  }, []);
+
+  const handleSidebarLeave = useCallback(() => {
+    hideTimer.current = setTimeout(() => setSidebarVisible(false), 400);
+  }, []);
+
+  const handleTriggerEnter = useCallback(() => {
+    setSidebarVisible(true);
+  }, []);
+
+  // 主内容左边距
+  const sidebarWidth = autoHide
+    ? (sidebarVisible ? (sidebarCollapsed ? '60px' : '220px') : '0px')
+    : (sidebarCollapsed ? '60px' : '220px');
 
   return (
     <div className="min-h-screen">
@@ -76,6 +95,14 @@ export default function App() {
       <div className="bg-orb bg-orb-1" />
       <div className="bg-orb bg-orb-2" />
       <div className="bg-orb bg-orb-3" />
+
+      {/* 触发区：鼠标移到左边缘弹出侧边栏 */}
+      {autoHide && !sidebarVisible && (
+        <div
+          onMouseEnter={handleTriggerEnter}
+          className="fixed left-0 top-0 bottom-0 w-[6px] z-50 cursor-default"
+        />
+      )}
 
       {/* Sidebar */}
       <Sidebar
@@ -86,6 +113,10 @@ export default function App() {
         pluginCount={plugins.length}
         t={t}
         onOpenSettings={() => setSettingsOpen(true)}
+        visible={sidebarVisible}
+        autoHide={autoHide}
+        onMouseEnter={handleSidebarEnter}
+        onMouseLeave={handleSidebarLeave}
       />
 
       {/* Settings Modal */}
@@ -134,7 +165,6 @@ export default function App() {
                   </div>
                 </div>
               </div>
-
               <div className="flex-1">
                 <MilestoneTracker
                   plugin={selectedPlugin}
@@ -150,47 +180,24 @@ export default function App() {
             </div>
           )}
 
-          {activeTab === 'sprint' && (
-            <SprintBoard plugins={plugins} t={t} />
-          )}
-
+          {activeTab === 'sprint' && <SprintBoard plugins={plugins} t={t} />}
           {activeTab === 'ideas' && (
             <IdeaVault
-              plugins={plugins}
-              storeIdeas={standaloneIdeas}
-              onAddIdea={addIdea}
-              onUpdateIdea={updateIdea}
-              onDeleteIdea={deleteIdea}
-              t={t}
-              lang={lang}
+              plugins={plugins} storeIdeas={standaloneIdeas}
+              onAddIdea={addIdea} onUpdateIdea={updateIdea} onDeleteIdea={deleteIdea}
+              t={t} lang={lang}
             />
           )}
-
-          {activeTab === 'timeline' && (
-            <TimelineView plugins={plugins} t={t} />
-          )}
-
-          {activeTab === 'stats' && (
-            <StatsDashboard plugins={plugins} t={t} />
-          )}
-
+          {activeTab === 'timeline' && <TimelineView plugins={plugins} t={t} />}
+          {activeTab === 'stats' && <StatsDashboard plugins={plugins} t={t} />}
           {activeTab === 'tags' && (
             <TagManager
-              plugins={plugins}
-              storeTags={store.tags || []}
-              onAddTag={addTag}
-              onRemoveTag={removeTag}
-              t={t}
+              plugins={plugins} storeTags={store.tags || []}
+              onAddTag={addTag} onRemoveTag={removeTag} t={t}
             />
           )}
-
           {activeTab === 'data' && (
-            <DataManager
-              store={store}
-              onImport={importStore}
-              onReset={resetStore}
-              t={t}
-            />
+            <DataManager store={store} onImport={importStore} onReset={resetStore} t={t} />
           )}
         </div>
       </main>
