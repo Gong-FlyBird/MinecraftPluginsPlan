@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Edit3, Trash2, Clock, Tag, ChevronDown, ChevronRight } from 'lucide-react';
+import { Edit3, Trash2, Clock, Tag, ChevronDown, ChevronRight } from 'lucide-react';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { timeAgo, calcProgress } from '../utils/helpers';
 
@@ -32,18 +32,15 @@ export default function PluginCard({ plugin, onEdit, onDelete, dragOverlay, t })
     <div
       ref={setNodeRef}
       style={style}
-      className={`glass-card mb-3 group overflow-hidden ${isDragging ? 'dragging' : ''} ${dragOverlay ? 'scale-105 shadow-gold' : ''}`}
+      {...attributes}
+      {...listeners}
+      className={`glass-card mb-3 group overflow-hidden cursor-grab active:cursor-grabbing ${isDragging ? 'dragging' : ''} ${dragOverlay ? 'scale-105 shadow-gold' : ''}`}
     >
       {/* Collapsed: name only */}
       <div
-        className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none"
+        className="flex items-center gap-3 px-4 py-3 select-none"
         onClick={() => setExpanded(!expanded)}
       >
-        <button {...attributes} {...listeners}
-          onClick={e => e.stopPropagation()}
-          className="text-hermes-text-muted/30 hover:text-hermes-gold/50 transition-colors cursor-grab active:cursor-grabbing flex-shrink-0">
-          <GripVertical size={15} />
-        </button>
 
         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusColor}`} />
 
