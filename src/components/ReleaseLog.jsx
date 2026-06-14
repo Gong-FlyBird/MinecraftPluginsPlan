@@ -13,15 +13,14 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, t }
     const releases = [];
     plugins.forEach(p => {
       (p.releases || []).forEach(r => {
-        releases.push({ ...r, _pluginName: p.name, _pluginVersion: p.version, _pluginStatus: p.status, _pluginId: p.id });
+        releases.push({ ...r, _pluginName: p.name, _pluginId: p.id });
       });
     });
     return releases.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }, [plugins]);
 
   const handleSubmit = () => {
-    if (!form.pluginId) { alert('请选择插件'); return; }
-    if (!form.version) return;
+    if (!form.pluginId || !form.version) return;
     onAddRelease(form.pluginId, {
       version: form.version,
       title: form.title || `v${form.version}`,
@@ -84,9 +83,6 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, t }
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-hermes-text">{r._pluginName}</span>
                       <span className="tag text-[10px]">v{r.version}</span>
-                      {r._pluginVersion !== r.version && (
-                        <span className="tag text-[10px] bg-hermes-gold/10 text-hermes-gold">当前 v{r._pluginVersion}</span>
-                      )}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-hermes-text-muted/70">{r.title}</span>

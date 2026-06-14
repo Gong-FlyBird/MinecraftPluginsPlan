@@ -225,14 +225,7 @@ export function useStore() {
     ...prev,
     plugins: prev.plugins.map(p =>
       p.id === pluginId
-        ? { ...p,
-            version: release.version || p.version,
-            changelog: release.notes
-              ? (p.changelog ? p.changelog + '\n\n' + release.notes : release.notes)
-              : p.changelog,
-            releases: [...(p.releases || []), { ...release, id: uid() }],
-            updatedAt: Date.now(),
-          }
+        ? { ...p, releases: [...(p.releases || []), { ...release, id: uid() }], updatedAt: Date.now() }
         : p
     ),
   }));
