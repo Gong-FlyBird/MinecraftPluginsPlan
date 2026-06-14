@@ -10,7 +10,10 @@ const INITIAL_STORE = {
   tags: [],
   settings: {
     sprintDays: 14,
-    theme: 'dark',
+    theme: 'gold',
+    accent: 'gold',
+    corner: 'square',
+    language: 'zh',
   },
 };
 
@@ -178,6 +181,13 @@ export function useStore() {
     })),
   }));
 
+  /* ──────── 设置 ──────── */
+
+  const updateSettings = (patch) => setStore(prev => ({
+    ...prev,
+    settings: { ...prev.settings, ...patch },
+  }));
+
   /* ──────── 全局 ──────── */
 
   const importStore = (data) => {
@@ -206,5 +216,7 @@ export function useStore() {
     addTag, removeTag,
     // System
     importStore, resetStore,
+    // Settings
+    updateSettings,
   };
 }

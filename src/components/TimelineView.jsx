@@ -10,7 +10,7 @@ const ACTION_ICONS = {
   status: { icon: Package, color: 'text-amber-400' },
 };
 
-export default function TimelineView({ plugins }) {
+export default function TimelineView({ plugins, t }) {
   const events = useMemo(() => {
     const evts = [];
     plugins.forEach(p => {
@@ -22,45 +22,30 @@ export default function TimelineView({ plugins }) {
   }, [plugins]);
 
   if (plugins.length === 0) {
-    return (
-      <EmptyState
-        icon={Clock}
-        title="暂无活动记录"
-        description="创建插件后，这里将显示所有变更历史"
-      />
-    );
+    return <EmptyState icon={Clock} title={t('timeline.empty')} description={t('timeline.empty.desc')} />;
   }
 
   return (
     <div className="fade-in">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-hermes-text">时间线</h1>
-        <p className="text-sm text-hermes-text-muted/60 mt-1">按时间顺序回顾所有插件开发动态</p>
+        <h1 className="text-2xl font-bold text-hermes-text">{t('timeline.title')}</h1>
+        <p className="text-sm text-hermes-text-muted/60 mt-1">{t('timeline.subtitle')}</p>
       </div>
 
-      {/* Stats Summary */}
       <GlassPanel className="mb-6">
         <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-hermes-gold">{plugins.length}</div>
-            <div className="text-[11px] text-hermes-text-muted/50 mt-1">插件总数</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-hermes-gold">{events.length}</div>
-            <div className="text-[11px] text-hermes-text-muted/50 mt-1">事件总数</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-hermes-gold">
-              {plugins.filter(p => p.status === 'released').length}
-            </div>
-            <div className="text-[11px] text-hermes-text-muted/50 mt-1">已发布</div>
-          </div>
+          <div><div className="text-2xl font-bold text-hermes-gold">{plugins.length}</div>
+            <div className="text-[11px] text-hermes-text-muted/50 mt-1">{t('timeline.plugins')}</div></div>
+          <div><div className="text-2xl font-bold text-hermes-gold">{events.length}</div>
+            <div className="text-[11px] text-hermes-text-muted/50 mt-1">{t('timeline.events')}</div></div>
+          <div><div className="text-2xl font-bold text-hermes-gold">
+            {plugins.filter(p => p.status === 'released').length}</div>
+            <div className="text-[11px] text-hermes-text-muted/50 mt-1">{t('timeline.released')}</div></div>
         </div>
       </GlassPanel>
 
-      {/* Timeline */}
       {events.length === 0 ? (
-        <EmptyState icon={Clock} title="暂无事件" />
+        <EmptyState icon={Clock} title={t('timeline.noEvents')} />
       ) : (
         <div className="space-y-2">
           {events.map((evt, idx) => {
@@ -68,13 +53,11 @@ export default function TimelineView({ plugins }) {
             const Icon = meta.icon;
             return (
               <div key={evt.id || idx} className="timeline-line flex gap-4 pl-1">
-                {/* Dot */}
                 <div className="flex flex-col items-center pt-1">
                   <div className={`w-6 h-6 rounded-full glass flex items-center justify-center ${meta.color}`}>
                     <Icon size={12} />
                   </div>
                 </div>
-                {/* Content */}
                 <GlassPanel className="flex-1 !py-3 !px-4 mb-0">
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -82,7 +65,7 @@ export default function TimelineView({ plugins }) {
                       <span className="text-sm text-hermes-text-muted/70 ml-2">{evt.detail || ''}</span>
                     </div>
                     <span className="text-[10px] text-hermes-text-muted/40 whitespace-nowrap" title={formatDateTime(evt.timestamp)}>
-                      {timeAgo(evt.timestamp)}
+                      {timeAgo(evt.timestamp, t)}
                     </span>
                   </div>
                 </GlassPanel>

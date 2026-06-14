@@ -12,7 +12,13 @@ import PluginForm from './PluginForm';
 import EmptyState from './EmptyState';
 import { STATUSES } from '../utils/helpers';
 
-export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveStatus }) {
+const COL_COLORS = {
+  planning: 'bg-blue-400',
+  developing: 'bg-amber-400',
+  released: 'bg-emerald-400',
+};
+
+export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveStatus, t }) {
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState(null);
   const [activeId, setActiveId] = useState(null);
@@ -35,92 +41,62 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     [activeId, plugins]
   );
 
-  const handleDragStart = useCallback(({ active }) => {
-    setActiveId(active.id);
-  }, []);
-
+  const handleDragStart = useCallback(({ active }) => setActiveId(active.id), []);
   const handleDragEnd = useCallback(({ active, over }) => {
     setActiveId(null);
     if (!over) return;
-    // Find target column status
     const targetCol = columns.find(c =>
       c.items.some(p => p.id === over.id) || over.id === c.value
     );
-    if (targetCol && active.id !== over.id) {
-      onMoveStatus(active.id, targetCol.value);
-    }
+    if (targetCol && active.id !== over.id) onMoveStatus(active.id, targetCol.value);
   }, [columns, onMoveStatus]);
 
-  const handleEdit = (plugin) => {
-    setEditingPlugin(plugin);
-    setFormOpen(true);
-  };
-
+  const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
   const handleSave = (data) => {
-    if (editingPlugin) {
-      onUpdatePlugin(editingPlugin.id, data);
-    } else {
-      onAddPlugin(data);
-    }
+    editingPlugin ? onUpdatePlugin(editingPlugin.id, data) : onAddPlugin(data);
     setEditingPlugin(null);
   };
+  const handleClose = () => { setFormOpen(false); setEditingPlugin(null); };
 
-  const handleClose = () => {
-    setFormOpen(false);
-    setEditingPlugin(null);
-  };
+  const statusColor = (s) => COL_COLORS[s.value] || 'bg-gray-400';
 
   return (
     <div className="fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-hermes-text">插件看板</h1>
-          <p className="text-sm text-hermes-text-muted/60 mt-1">拖拽卡片在各状态间移动</p>
+          <h1 className="text-2xl font-bold text-hermes-text">{t('kanban.title')}</h1>
+          <p className="text-sm text-hermes-text-muted/60 mt-1">{t('kanban.subtitle')}</p>
         </div>
         <button
           onClick={() => { setEditingPlugin(null); setFormOpen(true); }}
           className="glass-btn glass-btn-primary flex items-center gap-2"
         >
-          <Plus size={16} /> 新建插件
+          <Plus size={16} /> {t('kanban.new')}
         </button>
       </div>
 
-      {/* Columns */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCorners}
+        onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex flex-col md:flex-row gap-4">
           {columns.map(col => (
             <div key={col.value} className="flex-1 glass p-4 min-h-[200px]">
-              {/* Column Header */}
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-hermes-border/30">
                 <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${col.color.includes('blue') ? 'bg-blue-400' : col.color.includes('amber') ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-                  <h3 className="text-sm font-semibold text-hermes-text">{col.label}</h3>
+                  <span className={`w-2 h-2 rounded-full ${statusColor(col)}`} />
+                  <h3 className="text-sm font-semibold text-hermes-text">{t(`kanban.${col.value}`)}</h3>
                 </div>
                 <span className="text-xs text-hermes-text-muted/50 bg-hermes-gold/8 px-2 py-0.5">
                   {col.items.length}
                 </span>
               </div>
 
-              {/* Cards */}
               {col.items.length === 0 ? (
-                <div className="text-center py-8 text-xs text-hermes-text-muted/40">
-                  拖拽插件到此处
-                </div>
+                <div className="text-center py-8 text-xs text-hermes-text-muted/40">{t('kanban.drop')}</div>
               ) : (
                 <SortableContext items={col.items.map(p => p.id)} strategy={verticalListSortingStrategy}>
                   {col.items.map(plugin => (
-                    <PluginCard
-                      key={plugin.id}
-                      plugin={plugin}
-                      onEdit={handleEdit}
-                      onDelete={onDeletePlugin}
-                    />
+                    <PluginCard key={plugin.id} plugin={plugin}
+                      onEdit={handleEdit} onDelete={onDeletePlugin} t={t} />
                   ))}
                 </SortableContext>
               )}
@@ -128,33 +104,23 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ))}
         </div>
 
-        {/* Drag Overlay */}
         <DragOverlay>
           {activePlugin ? (
-            <PluginCard plugin={activePlugin} dragOverlay onEdit={() => {}} onDelete={() => {}} />
+            <PluginCard plugin={activePlugin} dragOverlay onEdit={() => {}} onDelete={() => {}} t={t} />
           ) : null}
         </DragOverlay>
       </DndContext>
 
-      {/* Plugin Form Modal */}
-      <PluginForm
-        open={formOpen}
-        onClose={handleClose}
-        onSave={handleSave}
-        plugin={editingPlugin}
-      />
+      <PluginForm open={formOpen} onClose={handleClose} onSave={handleSave} plugin={editingPlugin} t={t} />
 
-      {/* Empty State (no plugins at all) */}
       {plugins.length === 0 && (
         <EmptyState
-          title="还没有插件项目"
-          description="点击「新建插件」开始规划你的 Minecraft 插件开发之旅"
+          title={t('timeline.empty')}
+          description={t('stats.empty')}
           action={
-            <button
-              onClick={() => { setEditingPlugin(null); setFormOpen(true); }}
-              className="glass-btn glass-btn-primary flex items-center gap-2 mx-auto"
-            >
-              <Plus size={16} /> 新建第一个插件
+            <button onClick={() => { setEditingPlugin(null); setFormOpen(true); }}
+              className="glass-btn glass-btn-primary flex items-center gap-2 mx-auto">
+              <Plus size={16} /> {t('kanban.new')}
             </button>
           }
         />

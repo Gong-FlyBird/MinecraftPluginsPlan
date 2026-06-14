@@ -22,18 +22,24 @@ export function formatDateTime(ts) {
   return d.toISOString().slice(0, 10) + ' ' + d.toTimeString().slice(0, 5);
 }
 
-/** 相对时间（中文） */
-export function timeAgo(ts) {
+/** 相对时间 */
+export function timeAgo(ts, t) {
+  const fn = t || ((key, p) => {
+    const fallback = { 'time.justNow':'刚刚','time.minAgo':'{n} 分钟前','time.hourAgo':'{n} 小时前','time.dayAgo':'{n} 天前','time.monthAgo':'{n} 个月前','time.yearAgo':'{n} 年前' };
+    let s = fallback[key] || key;
+    if (p) for (const [k,v] of Object.entries(p)) s = s.replace(`{${k}}`, v);
+    return s;
+  });
   const diff = Date.now() - new Date(ts).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return '刚刚';
-  if (mins < 60) return `${mins} 分钟前`;
+  if (mins < 1) return fn('time.justNow');
+  if (mins < 60) return fn('time.minAgo', { n: mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} 小时前`;
+  if (hours < 24) return fn('time.hourAgo', { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} 天前`;
+  if (days < 30) return fn('time.dayAgo', { n: days });
   const months = Math.floor(days / 30);
-  return `${months} 个月前`;
+  return fn('time.monthAgo', { n: months });
 }
 
 /** 计算里程碑完成百分比 */
