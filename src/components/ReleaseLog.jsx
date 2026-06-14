@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Plus, Package, Clock, Trash2, Edit3, Pin, PinOff, ChevronDown, ChevronRight } from 'lucide-react';
 import GlassPanel from './GlassPanel';
+import Modal from './Modal';
 import EmptyState from './EmptyState';
 import { timeAgo } from '../utils/helpers';
 import { toast } from '../components/Toast';
@@ -10,6 +11,7 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
   const [formVisible, setFormVisible] = useState(false);
   const [editingRelease, setEditingRelease] = useState(null);
   const [form, setForm] = useState({ pluginId: '', version: '', title: '', notes: '' });
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const allReleases = useMemo(() => {
     const releases = [];
@@ -141,7 +143,7 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
                       className="glass-btn !p-1.5 !border-0" title="编辑">
                       <Edit3 size={12} />
                     </button>
-                    <button onClick={e => { e.stopPropagation(); if (window.confirm('确定删除此发布？')) onDeleteRelease(r._pluginId, r.id); }}
+                    <button onClick={e => { e.stopPropagation(); setConfirmDelete({ pluginId: r._pluginId, releaseId: r.id, name: `${r._pluginName} v${r.version}` }); }}
                       className="glass-btn-danger !p-1.5 !border-0" title="删除">
                       <Trash2 size={12} />
                     </button>
@@ -157,6 +159,24 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
           })}
         </div>
       )}
+
+      {/* 删除确认弹窗 */}
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)}
+        title="确认删除">
+        <div className="px-6 py-4 space-y-4">
+          <p className="text-sm text-hermes-text-muted/70">
+            确定要删除 <span className="text-hermes-text font-medium">{confirmDelete?.name}</span> 的发布记录吗？
+          </p>
+          <p className="text-xs text-hermes-text-muted/40">此操作不可撤销。</p>
+          <div className="flex justify-end gap-3">
+            <button onClick={() => setConfirmDelete(null)} className="glass-btn">取消</button>
+            <button onClick={() => {
+              onDeleteRelease(confirmDelete.pluginId, confirmDelete.releaseId);
+              setConfirmDelete(null);
+            }} className="glass-btn glass-btn-primary !bg-red-500/80 hover:!bg-red-500">删除</button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
