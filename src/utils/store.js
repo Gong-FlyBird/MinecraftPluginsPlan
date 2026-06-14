@@ -46,7 +46,7 @@ export function useStore() {
       p.id === id
         ? { ...p, ...patch, updatedAt: Date.now(), timeline: [
             ...p.timeline,
-            { action: 'updated', detailKey: 'timeline.updated', detailParams: { name: patch.name || '' }, timestamp: Date.now() },
+            { action: 'updated', detailKey: 'timeline.updated', timestamp: Date.now() },
           ]}
         : p
     ),

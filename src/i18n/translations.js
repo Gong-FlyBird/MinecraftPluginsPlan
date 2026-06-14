@@ -156,7 +156,7 @@ const zh = {
   'timeline.empty.desc': '创建插件后，这里将显示所有变更历史',
   'timeline.noEvents': '暂无事件',
   'timeline.created': '创建插件',
-  'timeline.updated': '更新: {name}',
+  'timeline.updated': '已更新',
   'timeline.status': '状态变更 → {status}',
 
   /* ── 统计面板 ── */
@@ -355,7 +355,7 @@ const en = {
   'timeline.empty.desc': 'Activity will appear here after creating plugins',
   'timeline.noEvents': 'No events',
   'timeline.created': 'Plugin created',
-  'timeline.updated': 'Updated: {name}',
+  'timeline.updated': 'Updated',
   'timeline.status': 'Status → {status}',
 
   'stats.title': 'Statistics',
@@ -546,7 +546,7 @@ const ja = {
   'timeline.empty.desc': 'プラグイン作成後に表示されます',
   'timeline.noEvents': 'イベントなし',
   'timeline.created': 'プラグイン作成',
-  'timeline.updated': '更新: {name}',
+  'timeline.updated': '更新済み',
   'timeline.status': 'ステータス変更 → {status}',
 
   'stats.title': '統計',

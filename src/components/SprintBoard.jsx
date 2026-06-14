@@ -1,14 +1,13 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Target, CheckCircle2, Clock, Tag } from 'lucide-react';
+import { Calendar, Target, CheckCircle2, Clock, ChevronDown, ChevronRight, Tag } from 'lucide-react';
 import GlassPanel from './GlassPanel';
-import Modal from './Modal';
 import EmptyState from './EmptyState';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { calcProgress, timeAgo } from '../utils/helpers';
 
 export default function SprintBoard({ plugins, t }) {
   const [viewMode, setViewMode] = useState('week');
-  const [detailPlugin, setDetailPlugin] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
   const sprintData = useMemo(() => {
     const now = Date.now();
@@ -72,23 +71,87 @@ export default function SprintBoard({ plugins, t }) {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {items.map(p => {
+                  const isExpanded = expandedId === p.id;
                   const progress = calcProgress(p.milestones);
                   return (
-                    <GlassPanel key={p.id} className="!py-3 !px-4 cursor-pointer hover:bg-hermes-gold/[0.06] transition-colors"
-                      onClick={() => setDetailPlugin(p)}>
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="text-sm font-semibold text-hermes-text">{p.name}</h4>
-                        <span className="tag text-[10px]">{t(`status.${p.status}`)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[10px] text-hermes-text-muted/50 mb-2">
-                        <span>v{p.version}</span><span>·</span><span>MC {p.mcVersion}</span>
-                      </div>
-                      {p.milestones?.length > 0 && (
-                        <div className="mt-2">
-                          <div className="flex justify-between text-[10px] text-hermes-text-muted/50 mb-1">
-                            <span>{t('app.progress')}</span><span>{progress}%</span>
+                    <GlassPanel key={p.id} className={`!py-3 !px-4 cursor-pointer transition-all ${isExpanded ? '' : 'hover:bg-hermes-gold/[0.06]'}`}>
+                      {/* 折叠头 */}
+                      <div className="select-none" onClick={() => setExpandedId(isExpanded ? null : p.id)}>
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="text-sm font-semibold text-hermes-text">{p.name}</h4>
+                          <span className="tag text-[10px]">{t(`status.${p.status}`)}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] text-hermes-text-muted/50 mb-2">
+                          <span>v{p.version}</span><span>·</span><span>MC {p.mcVersion}</span>
+                        </div>
+                        {p.milestones?.length > 0 && !isExpanded && (
+                          <div className="mt-2">
+                            <div className="flex justify-between text-[10px] text-hermes-text-muted/50 mb-1">
+                              <span>{t('app.progress')}</span><span>{progress}%</span>
+                            </div>
+                            <div className="progress-bar"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
                           </div>
-                          <div className="progress-bar"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
+                        )}
+                        <div className="flex justify-center mt-1 text-hermes-text-muted/30">
+                          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                        </div>
+                      </div>
+
+                      {/* 展开详情 */}
+                      {isExpanded && (
+                        <div className="border-t border-hermes-border/30 pt-3 mt-2 slide-up space-y-3">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <StatusBadge status={p.status} t={t} />
+                            <PriorityBadge priority={p.priority} t={t} />
+                            <span className="text-xs text-hermes-text-muted/50">v{p.version}</span>
+                          </div>
+
+                          {p.tags?.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {p.tags.map((tag, i) => (
+                                <span key={i} className="tag text-[10px]">{tag}</span>
+                              ))}
+                            </div>
+                          )}
+
+                          {p.milestones?.length > 0 && (
+                            <div>
+                              <div className="flex justify-between text-xs text-hermes-text-muted/60 mb-1">
+                                <span>{t('app.progress')}</span><span>{progress}%</span>
+                              </div>
+                              <div className="progress-bar h-2"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
+                              <div className="mt-2 space-y-2">
+                                {p.milestones.map(m => (
+                                  <div key={m.id}>
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs font-medium text-hermes-text">{m.title}</span>
+                                      <span className="text-[10px] text-hermes-text-muted/40">{timeAgo(m.createdAt, t)}</span>
+                                    </div>
+                                    {m.tasks?.length > 0 && (
+                                      <div className="space-y-0.5 mt-1 ml-2">
+                                        {m.tasks.map(task => (
+                                          <div key={task.id} className="flex items-center gap-2 text-xs text-hermes-text-muted/60">
+                                            <span className={`w-3 h-3 rounded-sm border flex items-center justify-center ${task.done ? 'bg-hermes-gold border-hermes-gold' : 'border-hermes-border/50'}`}>
+                                              {task.done && <span className="text-white text-[8px]">✓</span>}
+                                            </span>
+                                            {task.text}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {p.description && (
+                            <p className="text-xs text-hermes-text-muted/70">{p.description}</p>
+                          )}
+
+                          <div className="text-[10px] text-hermes-text-muted/40 pt-1 border-t border-hermes-border/20">
+                            {t('timeline.updated')}: {timeAgo(p.updatedAt, t)}
+                          </div>
                         </div>
                       )}
                     </GlassPanel>
@@ -99,71 +162,6 @@ export default function SprintBoard({ plugins, t }) {
           </div>
         );
       })}
-
-      {/* 插件详情弹窗 */}
-      <Modal open={!!detailPlugin} onClose={() => setDetailPlugin(null)}
-        title={detailPlugin?.name || ''}>
-        {detailPlugin && (
-          <div className="px-6 py-4 space-y-4 text-sm">
-            <div className="flex items-center gap-3">
-              <StatusBadge status={detailPlugin.status} t={t} />
-              <PriorityBadge priority={detailPlugin.priority} t={t} />
-              <span className="text-hermes-text-muted/50">v{detailPlugin.version}</span>
-              <span className="text-hermes-text-muted/50">MC {detailPlugin.mcVersion}</span>
-            </div>
-
-            {detailPlugin.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {detailPlugin.tags.map((tag, i) => (
-                  <span key={i} className="tag text-xs">{tag}</span>
-                ))}
-              </div>
-            )}
-
-            {detailPlugin.milestones?.length > 0 && (
-              <div>
-                <div className="flex justify-between text-xs text-hermes-text-muted/60 mb-1">
-                  <span>{t('app.progress')}</span>
-                  <span>{calcProgress(detailPlugin.milestones)}%</span>
-                </div>
-                <div className="progress-bar h-2"><div className="progress-bar-fill" style={{ width: `${calcProgress(detailPlugin.milestones)}%` }} /></div>
-              </div>
-            )}
-
-            {detailPlugin.milestones?.map(m => (
-              <div key={m.id} className="border-l-2 border-hermes-border/30 pl-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-hermes-text">{m.title}</span>
-                  <span className="text-[10px] text-hermes-text-muted/40">{timeAgo(m.createdAt, t)}</span>
-                </div>
-                {m.tasks?.length > 0 && (
-                  <div className="space-y-0.5 mt-1">
-                    {m.tasks.map(task => (
-                      <label key={task.id} className="flex items-center gap-2 text-xs text-hermes-text-muted/60">
-                        <span className={`w-3 h-3 rounded-sm border flex items-center justify-center ${task.done ? 'bg-hermes-gold border-hermes-gold' : 'border-hermes-border/50'}`}>
-                          {task.done && <span className="text-white text-[8px]">✓</span>}
-                        </span>
-                        {task.text}
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {detailPlugin.description && (
-              <div>
-                <h4 className="text-xs font-semibold text-hermes-text-muted/60 uppercase tracking-wider mb-1">{t('plugin.description')}</h4>
-                <p className="text-sm text-hermes-text-muted/70">{detailPlugin.description}</p>
-              </div>
-            )}
-
-            <div className="text-[10px] text-hermes-text-muted/40 pt-2 border-t border-hermes-border/30">
-              {t('timeline.updated')}: {timeAgo(detailPlugin.updatedAt, t)}
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 }
