@@ -80,7 +80,7 @@ export default function TagManager({ plugins, storeTags, onAddTag, onRemoveTag }
             <GlassPanel key={tag} className="!py-2 !px-3 flex items-center gap-2">
               <Tag size={12} className="text-hermes-gold/60" />
               <span className="text-sm text-hermes-text">{tag}</span>
-              <span className="text-[10px] text-hermes-text-muted/50 bg-hermes-gold/8 px-1.5 py-0.5 rounded-full">
+              <span className="text-[10px] text-hermes-text-muted/50 bg-hermes-gold/8 px-1.5 py-0.5">
                 {allTagCounts[tag]}
               </span>
               <button

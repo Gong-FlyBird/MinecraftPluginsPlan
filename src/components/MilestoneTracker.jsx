@@ -53,8 +53,8 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
           <span className="text-sm text-hermes-text-muted">总进度</span>
           <span className="text-lg font-bold text-hermes-gold">{progress}%</span>
         </div>
-        <div className="progress-bar h-2 rounded-full">
-          <div className="progress-bar-fill rounded-full" style={{ width: `${progress}%` }} />
+        <div className="progress-bar h-2">
+          <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
         </div>
       </GlassPanel>
 
@@ -116,7 +116,7 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); onDeleteMilestone(plugin.id, m.id); }}
-                    className="glass-btn-danger !p-1.5 !rounded-lg !border-0 opacity-0 hover:opacity-100 transition-opacity"
+                    className="glass-btn-danger !p-1.5 !border-0 opacity-0 hover:opacity-100 transition-opacity"
                   >
                     <Trash2 size={13} />
                   </button>
@@ -131,7 +131,7 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
                     )}
                     <div className="space-y-1.5 mb-3">
                       {tasks.map(task => (
-                        <div key={task.id} className="flex items-center gap-3 group py-1.5 px-2 rounded-lg hover:bg-hermes-gold/[0.06] transition-colors">
+                        <div key={task.id} className="flex items-center gap-3 group py-1.5 px-2 hover:bg-hermes-gold/[0.06] transition-colors">
                           <button
                             onClick={() => onToggleTask(plugin.id, m.id, task.id)}
                             className="flex-shrink-0"

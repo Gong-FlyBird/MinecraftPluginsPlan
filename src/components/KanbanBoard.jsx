@@ -95,14 +95,14 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       >
         <div className="flex flex-col md:flex-row gap-4">
           {columns.map(col => (
-            <div key={col.value} className="flex-1 glass rounded-xl p-4 min-h-[200px]">
+            <div key={col.value} className="flex-1 glass p-4 min-h-[200px]">
               {/* Column Header */}
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-hermes-border/30">
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full ${col.color.includes('blue') ? 'bg-blue-400' : col.color.includes('amber') ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                   <h3 className="text-sm font-semibold text-hermes-text">{col.label}</h3>
                 </div>
-                <span className="text-xs text-hermes-text-muted/50 bg-hermes-gold/8 px-2 py-0.5 rounded-full">
+                <span className="text-xs text-hermes-text-muted/50 bg-hermes-gold/8 px-2 py-0.5">
                   {col.items.length}
                 </span>
               </div>

@@ -89,7 +89,7 @@ export default function App() {
             <div className="flex gap-4">
               {/* Plugin Selector Sidebar */}
               <div className="w-56 flex-shrink-0">
-                <div className="glass rounded-xl p-3">
+                <div className="glass p-3">
                   <h3 className="text-xs font-semibold text-hermes-text-muted/60 uppercase tracking-wider mb-3 px-2">
                     选择插件
                   </h3>
@@ -98,7 +98,7 @@ export default function App() {
                       <button
                         key={p.id}
                         onClick={() => setSelectedPluginId(p.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                        className={`w-full text-left px-3 py-2 text-sm transition-all ${
                           selectedPluginId === p.id
                             ? 'nav-active'
                             : 'nav-inactive'

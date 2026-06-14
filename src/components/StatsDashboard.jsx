@@ -148,8 +148,8 @@ export default function StatsDashboard({ plugins }) {
             </span>
             <span className="text-lg font-bold text-hermes-gold">{stats.completionRate}%</span>
           </div>
-          <div className="progress-bar h-3 rounded-full">
-            <div className="progress-bar-fill rounded-full" style={{ width: `${stats.completionRate}%` }} />
+          <div className="progress-bar h-3">
+            <div className="progress-bar-fill" style={{ width: `${stats.completionRate}%` }} />
           </div>
         </GlassPanel>
       )}

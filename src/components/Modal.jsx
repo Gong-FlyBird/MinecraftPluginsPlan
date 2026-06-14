@@ -27,7 +27,7 @@ export default function Modal({ open, onClose, title, children, wide }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-hermes-border/30">
           <h2 className="text-lg font-semibold text-hermes-text">{title}</h2>
-          <button onClick={onClose} className="glass-btn !p-2 !rounded-full !border-0 hover:!bg-hermes-gold/8">
+          <button onClick={onClose} className="glass-btn !p-2 !border-0 hover:!bg-hermes-gold/8">
             <X size={16} />
           </button>
         </div>

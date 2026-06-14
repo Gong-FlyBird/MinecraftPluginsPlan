@@ -56,7 +56,7 @@ export default function SprintBoard({ plugins }) {
           <h1 className="text-2xl font-bold text-hermes-text">冲刺看板</h1>
           <p className="text-sm text-hermes-text-muted/60 mt-1">按 GTD 周回顾视角聚焦当前重点工作</p>
         </div>
-        <div className="flex gap-1 bg-hermes-gold/8 rounded-lg p-1">
+        <div className="flex gap-1 bg-hermes-gold/8 p-1">
           <button
             onClick={() => setViewMode('week')}
             className={`glass-btn !py-1.5 !px-4 text-xs ${viewMode === 'week' ? 'glass-btn-primary' : ''}`}
@@ -94,7 +94,7 @@ export default function SprintBoard({ plugins }) {
             </div>
 
             {items.length === 0 ? (
-              <div className="text-center py-6 text-sm text-hermes-text-muted/30 glass-card rounded-xl">
+              <div className="text-center py-6 text-sm text-hermes-text-muted/30 glass-card">
                 暂无
               </div>
             ) : (

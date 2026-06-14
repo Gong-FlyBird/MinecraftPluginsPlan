@@ -76,13 +76,13 @@ export default function PluginCard({ plugin, onEdit, onDelete, dragOverlay }) {
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           <button
             onClick={e => { e.stopPropagation(); onEdit(plugin); }}
-            className="glass-btn !p-1 !rounded-lg !border-0 hover:!bg-hermes-gold/8"
+            className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8"
           >
             <Edit3 size={12} />
           </button>
           <button
             onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
-            className="glass-btn-danger !p-1 !rounded-lg !border-0"
+            className="glass-btn-danger !p-1 !border-0"
           >
             <Trash2 size={12} />
           </button>

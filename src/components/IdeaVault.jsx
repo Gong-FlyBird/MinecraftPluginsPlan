@@ -151,7 +151,7 @@ export default function IdeaVault({ plugins, storeIdeas, onAddIdea, onUpdateIdea
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); onDeleteIdea(idea.id); }}
-                    className="glass-btn-danger !p-1.5 !rounded-lg !border-0 opacity-0 hover:opacity-100 transition-opacity"
+                    className="glass-btn-danger !p-1.5 !border-0 opacity-0 hover:opacity-100 transition-opacity"
                   >
                     <Trash2 size={13} />
                   </button>

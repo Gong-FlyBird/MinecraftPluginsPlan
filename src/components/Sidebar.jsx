@@ -28,7 +28,7 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, p
       <div className="relative flex flex-col h-full py-4">
         {/* Logo */}
         <div className="px-4 mb-8 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-hermes-gold/10 border border-hermes-gold/20 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-hermes-gold/10 border border-hermes-gold/20 flex items-center justify-center flex-shrink-0">
             <Package size={16} className="text-hermes-gold" />
           </div>
           {!collapsed && (
@@ -42,7 +42,7 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, p
         {/* Toggle Button */}
         <button
           onClick={onToggle}
-          className="absolute -right-3 top-6 w-6 h-6 rounded-full sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10"
+          className="absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10"
         >
           <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
         </button>
@@ -56,7 +56,7 @@ export default function Sidebar({ activeTab, onTabChange, collapsed, onToggle, p
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-left ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-left ${
                   isActive
                     ? 'nav-active'
                     : 'nav-inactive'
