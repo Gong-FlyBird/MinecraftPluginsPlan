@@ -65,7 +65,7 @@ export default function Sidebar({
         </button>
 
         {/* Nav Items */}
-        <nav className="flex-1 px-2 space-y-1">
+        <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(item => {
             const isActive = activeTab === item.id;
             const Icon = item.icon;
