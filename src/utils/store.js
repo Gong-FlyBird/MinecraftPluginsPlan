@@ -61,17 +61,54 @@ export function useStore() {
     }));
   };
 
-  const movePluginStatus = (id, newStatus) => setStore(prev => ({
-    ...prev,
-    plugins: prev.plugins.map(p =>
-      p.id === id
-        ? { ...p, status: newStatus, updatedAt: Date.now(), timeline: [
-            ...p.timeline,
-            { action: 'status', detailKey: 'timeline.status', detailParams: { status: newStatus }, timestamp: Date.now() },
-          ]}
-        : p
-    ),
-  }));
+  const movePluginStatus = (id, newStatus) => setStore(prev => {
+    const plugin = prev.plugins.find(p => p.id === id);
+    if (!plugin || plugin.status === newStatus) return prev;
+    return {
+      ...prev,
+      plugins: prev.plugins.map(p =>
+        p.id === id
+          ? { ...p, status: newStatus, updatedAt: Date.now(), timeline: [
+              ...p.timeline,
+              { action: 'status', detailKey: 'timeline.status', detailParams: { status: newStatus }, timestamp: Date.now() },
+            ]}
+          : p
+      ),
+    };
+  });
+
+  /** 跨列移动到指定位置 */
+  const movePluginTo = (id, newStatus, targetIdx) => setStore(prev => {
+    const plugins = [...prev.plugins];
+    const idx = plugins.findIndex(p => p.id === id);
+    if (idx === -1 || plugins[idx].status === newStatus) return prev;
+    const plugin = plugins.splice(idx, 1)[0];
+    plugin.status = newStatus;
+    plugin.updatedAt = Date.now();
+    plugin.timeline = [
+      ...(plugin.timeline || []),
+      { action: 'status', detailKey: 'timeline.status', detailParams: { status: newStatus }, timestamp: Date.now() },
+    ];
+    // 计算插入位置
+    let insertAt = plugins.length;
+    let colIdx = -1;
+    for (let i = 0; i <= plugins.length; i++) {
+      if (i === plugins.length || plugins[i]?.status !== newStatus) continue;
+      colIdx++;
+      if (colIdx === (targetIdx ?? 999)) { insertAt = i; break; }
+    }
+    plugins.splice(insertAt, 0, plugin);
+    return { ...prev, plugins };
+  });
+
+  /** 同列重排序 */
+  const reorderPlugins = (orderedIds) => setStore(prev => {
+    const map = {};
+    prev.plugins.forEach(p => { map[p.id] = p; });
+    const reordered = orderedIds.map(id => map[id]).filter(Boolean);
+    const others = prev.plugins.filter(p => !orderedIds.includes(p.id));
+    return { ...prev, plugins: [...reordered, ...others] };
+  });
 
   /* ──────── Milestone & Task ──────── */
 
@@ -251,7 +288,7 @@ export function useStore() {
     store,
     setStore,
     // Plugin
-    addPlugin, updatePlugin, deletePlugin, movePluginStatus,
+    addPlugin, updatePlugin, deletePlugin, movePluginStatus, movePluginTo, reorderPlugins,
     // Milestone & Task
     addMilestone, updateMilestone, deleteMilestone,
     toggleTask, addTask, deleteTask,

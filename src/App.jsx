@@ -27,7 +27,7 @@ export default function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const {
-    store, addPlugin, updatePlugin, deletePlugin, movePluginStatus,
+    store, addPlugin, updatePlugin, deletePlugin, movePluginStatus, movePluginTo, reorderPlugins,
     addMilestone, updateMilestone, deleteMilestone,
     toggleTask, addTask, deleteTask,
     addIdea, updateIdea, deleteIdea, addPluginIdea,
@@ -204,6 +204,8 @@ export default function App() {
               onUpdatePlugin={updatePlugin}
               onDeletePlugin={handleDeletePlugin}
               onMoveStatus={movePluginStatus}
+              onMoveTo={movePluginTo}
+              onReorder={reorderPlugins}
               t={t}
             />
           )}
