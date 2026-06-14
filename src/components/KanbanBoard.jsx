@@ -133,20 +133,26 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       <DndContext sensors={sensors} collisionDetection={closestCorners}
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="flex flex-col md:flex-row gap-4 items-start">
-          {columns.map(col => (
+          {columns.map(col => {
+            const { setNodeRef, isOver } = useDroppable({ id: col.value });
+            const [extDragOver, setExtDragOver] = useState(false);
+            return (
             <div
               key={col.value}
-              onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }}
+              ref={setNodeRef}
+              onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setExtDragOver(true); }}
+              onDragLeave={() => setExtDragOver(false)}
               onDrop={e => {
                 e.preventDefault();
+                setExtDragOver(false);
                 const files = Array.from(e.dataTransfer.files);
                 files.forEach(f => {
-                  const name = f.name.replace(/\.[^.]+$/, ''); // 去掉扩展名
+                  const name = f.name.replace(/\.[^.]+$/, '');
                   onExternalDrop?.(name, col.value);
                 });
               }}
               className={`flex-1 glass p-4 min-h-[200px] shrink-0 transition-all ${
-                false ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/5' : ''
+                isOver ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/5' : extDragOver ? 'ring-2 ring-purple-400/40 bg-purple-400/5' : ''
               }`}
             >
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-hermes-border/30">
@@ -170,7 +176,8 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
                 </SortableContext>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <DragOverlay>
