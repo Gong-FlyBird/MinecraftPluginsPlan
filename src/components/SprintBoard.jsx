@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Target, CheckCircle2, Clock, ChevronDown, ChevronRight, Tag } from 'lucide-react';
+import { Calendar, Target, CheckCircle2, Clock, ChevronDown, ChevronUp, Tag } from 'lucide-react';
 import GlassPanel from './GlassPanel';
 import EmptyState from './EmptyState';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
@@ -93,7 +93,7 @@ export default function SprintBoard({ plugins, t }) {
                           </div>
                         )}
                         <div className="flex justify-center mt-1 text-hermes-text-muted/30">
-                          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                          {isExpanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
                         </div>
                       </div>
 
