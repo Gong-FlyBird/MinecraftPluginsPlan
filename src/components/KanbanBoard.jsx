@@ -10,6 +10,7 @@ import {
 import { Plus, Upload } from 'lucide-react';
 import PluginCard from './PluginCard';
 import PluginForm from './PluginForm';
+import Modal from './Modal';
 import EmptyState from './EmptyState';
 import { STATUSES } from '../utils/helpers';
 
@@ -104,6 +105,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState(null);
   const [activeId, setActiveId] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -161,6 +163,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
 
   const openNew = () => { setEditingPlugin(null); setFormOpen(true); };
   const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
+  const handleDeleteClick = (plugin) => { setConfirmDelete(plugin); };
   const handleSave = (data) => {
     if (!editingPlugin || !editingPlugin.id) {
       onAddPlugin(data);
@@ -195,7 +198,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
               key={col.value}
               col={col}
               onEdit={handleEdit}
-              onDelete={onDeletePlugin}
+              onDelete={handleDeleteClick}
               onReorder={onReorder}
               onExternalDrop={onExternalDrop}
               t={t}
@@ -212,6 +215,24 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       </DndContext>
 
       <PluginForm open={formOpen} onClose={handleClose} onSave={handleSave} plugin={editingPlugin} t={t} />
+
+      {/* 删除确认 */}
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)}
+        title="确认删除">
+        <div className="px-6 py-4 space-y-4">
+          <p className="text-sm text-hermes-text-muted/70">
+            确定要删除插件 <span className="text-hermes-text font-medium">{confirmDelete?.name}</span> 吗？
+          </p>
+          <p className="text-xs text-hermes-text-muted/40">此操作不可撤销，关联的灵感也将一并移除。</p>
+          <div className="flex justify-end gap-3">
+            <button onClick={() => setConfirmDelete(null)} className="glass-btn">取消</button>
+            <button onClick={() => {
+              onDeletePlugin(confirmDelete.id);
+              setConfirmDelete(null);
+            }} className="glass-btn glass-btn-primary !bg-red-500/80 hover:!bg-red-500">删除</button>
+          </div>
+        </div>
+      </Modal>
 
       {plugins.length === 0 && (
         <EmptyState
