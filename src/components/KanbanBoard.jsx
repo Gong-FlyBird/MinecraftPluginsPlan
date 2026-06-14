@@ -163,7 +163,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
 
   const openNew = () => { setEditingPlugin(null); setFormOpen(true); };
   const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
-  const handleDeleteClick = (plugin) => { setConfirmDelete(plugin); };
+  const handleDeleteClick = (id) => { setConfirmDelete(plugins.find(p => p.id === id)); };
   const handleSave = (data) => {
     if (!editingPlugin || !editingPlugin.id) {
       onAddPlugin(data);
