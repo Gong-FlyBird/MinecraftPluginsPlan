@@ -303,16 +303,16 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
   };
 
   const handlePageDragOver = (e) => {
-    // 只响应外部文件拖入（不是 dnd-kit 卡片拖拽）
-    if (e.dataTransfer.types?.includes('Files')) {
+    // 只响应外部文件拖入
+    const types = e.dataTransfer.types;
+    if (types && Array.from(types).includes('Files')) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
       setPageDragOver(true);
     }
   };
   const handlePageDragLeave = (e) => {
-    // 只在真正离开页面时关闭
-    if (!e.currentTarget.contains(e.relatedTarget)) setPageDragOver(false);
+    setPageDragOver(false);
   };
   const handlePageDrop = (e) => {
     e.preventDefault();

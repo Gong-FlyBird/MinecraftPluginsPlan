@@ -86,7 +86,8 @@ export default function App() {
   /** 从外部拖入文件创建插件 */
   const _dropOnce = useRef(0);
   const handleExternalDrop = (name, status) => {
-    addPlugin({ name, status, priority: 'external' });
+    const ok = addPlugin({ name, status, priority: 'external' });
+    if (!ok) return; // 已存在，addPlugin 自己弹了警告
     _dropOnce.current++;
     if (_dropOnce.current === 1) {
       toast('success', `已从外部导入：${name}`);

@@ -28,13 +28,14 @@ export function useStore() {
 
   let _toastOnce = (msg) => { toast('success', msg); _toastOnce = () => {}; };
   const addPlugin = (plugin) => {
+    let created = false;
+    let existed = false;
     setStore(prev => {
-      // 防重复：同名检查
       if (prev.plugins.some(p => p.name === plugin.name)) {
-        toast('warning', `插件「${plugin.name}」已存在`);
+        existed = true;
         return prev;
       }
-      _toastOnce('插件已创建');
+      created = true;
       return {
         ...prev,
         plugins: [...prev.plugins, {
@@ -46,6 +47,12 @@ export function useStore() {
         }],
       };
     });
+    // 异步队列已 flush，此时可以安全弹 toast
+    requestAnimationFrame(() => {
+      if (existed) toast('warning', `插件「${plugin.name}」已存在`);
+      if (created) _toastOnce('插件已创建');
+    });
+    return !existed; // 调用方可知道是否成功创建
   };
 
   const updatePlugin = (id, patch) => setStore(prev => ({
