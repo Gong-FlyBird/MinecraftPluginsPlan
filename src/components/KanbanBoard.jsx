@@ -22,20 +22,13 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
   const [expanded, setExpanded] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: plugin.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = { transform: CSS.Transform.toString(transform), transition };
   const progress = calcProgress(plugin.milestones);
 
   return (
-    <div
-      ref={setNodeRef} style={style} {...attributes} {...listeners}
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}
       onClick={() => setExpanded(!expanded)}
-      className={`glass-card overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
-        expanded ? '' : 'hover:bg-hermes-gold/[0.04]'
-      }`}
+      className={`glass-card overflow-hidden cursor-grab active:cursor-grabbing transition-all ${expanded ? '' : 'hover:bg-hermes-gold/[0.04]'}`}
     >
       <div className="px-3 py-2.5 flex items-center gap-2 min-w-0">
         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
@@ -45,16 +38,11 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
         <span className="flex-1 text-sm font-semibold text-hermes-text truncate min-w-0">{plugin.name}</span>
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
         <button onClick={e => { e.stopPropagation(); onEdit(plugin); }}
-          className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-          <Edit3 size={11} />
-        </button>
+          className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Edit3 size={11} /></button>
         <button onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
-          className="glass-btn-danger !p-1 !border-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-          <Trash2 size={11} />
-        </button>
+          className="glass-btn-danger !p-1 !border-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Trash2 size={11} /></button>
         <ChevronDown size={11} className={`text-hermes-text-muted/20 flex-shrink-0 transition-transform ${expanded ? '' : '-rotate-90'}`} />
       </div>
-
       {expanded && (
         <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-2 pt-2">
           <div className="flex items-center gap-2 flex-wrap">
@@ -63,9 +51,7 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
             <span className="text-xs text-hermes-text-muted/50">MC {plugin.mcVersion}</span>
           </div>
           {plugin.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {plugin.tags.map((tag, i) => <span key={i} className="tag text-[10px]">{tag}</span>)}
-            </div>
+            <div className="flex flex-wrap gap-1">{plugin.tags.map((tag, i) => <span key={i} className="tag text-[10px]">{tag}</span>)}</div>
           )}
           {plugin.milestones?.length > 0 && (
             <div>
@@ -75,9 +61,7 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
               <div className="progress-bar h-1.5"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
             </div>
           )}
-          {plugin.description && (
-            <p className="text-xs text-hermes-text-muted/70 line-clamp-3">{plugin.description}</p>
-          )}
+          {plugin.description && <p className="text-xs text-hermes-text-muted/70 line-clamp-3">{plugin.description}</p>}
           <div className="flex items-center gap-1 text-[10px] text-hermes-text-muted/40 pt-1">
             <Clock size={9} /><span>{timeAgo(plugin.updatedAt, t)}</span>
           </div>
@@ -87,11 +71,10 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
   );
 }
 
-/* ── 状态标签按钮（dnd-kit + 外部文件） ── */
+/* ── 状态标签（dnd-kit 落点 + 外部文件拖入） ── */
 function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   const { setNodeRef, isOver } = useDroppable({ id: col.value });
   const [extDragOver, setExtDragOver] = useState(false);
-
   const colorMap = {
     planning: { bg: 'bg-blue-400', ring: 'ring-blue-400/40' },
     developing: { bg: 'bg-amber-400', ring: 'ring-amber-400/40' },
@@ -100,16 +83,13 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   const c = colorMap[col.value] || colorMap.planning;
 
   return (
-    <button
-      ref={setNodeRef}
-      onClick={onClick}
+    <button ref={setNodeRef} onClick={onClick}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setExtDragOver(true); }}
       onDragLeave={() => setExtDragOver(false)}
       onDrop={e => { e.preventDefault(); e.stopPropagation(); setExtDragOver(false);
         Array.from(e.dataTransfer.files).forEach(f => onExternalDrop?.(f.name.replace(/\.[^.]+$/, ''), col.value)); }}
       className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-sm text-sm font-semibold transition-all ${
-        active
-          ? 'bg-hermes-gold/10 text-hermes-gold ring-1 ring-hermes-gold/40'
+        active ? 'bg-hermes-gold/10 text-hermes-gold ring-1 ring-hermes-gold/40'
           : 'text-hermes-text-muted/60 hover:text-hermes-text hover:bg-hermes-gold/[0.04]'
       } ${isOver || extDragOver ? 'ring-2 ' + c.ring + ' scale-[1.02]' : ''}`}
     >
@@ -120,74 +100,17 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   );
 }
 
-/* ── 网格区域（外部文件拖入提示） ── */
-function GridDropZone({ status, onExternalDrop, children }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `grid-${status}` });
-  const [extDragOver, setExtDragOver] = useState(false);
-
-  return (
-    <div
-      ref={setNodeRef}
-      onDragOver={e => {
-        if (e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files')) {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'copy';
-          setExtDragOver(true);
-        }
-      }}
-      onDragLeave={() => setExtDragOver(false)}
-      onDrop={e => { e.preventDefault(); e.stopPropagation(); setExtDragOver(false);
-        Array.from(e.dataTransfer.files).forEach(f => onExternalDrop?.(f.name.replace(/\.[^.]+$/, ''), status)); }}
-      className={`transition-all rounded-sm min-h-[80px] ${
-        isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03] -m-1 p-1' : ''
-      } ${extDragOver ? 'ring-2 ring-hermes-gold/50 bg-hermes-gold/10' : ''}`}
-    >
-      {extDragOver && (
-        <div className="flex items-center justify-center py-6 text-sm font-semibold text-hermes-gold">
-          松手放入插件
-        </div>
-      )}
-      {!extDragOver && children}
-    </div>
-  );
-}
-
-/* ── 拖拽中可见的大面积落点指示条 ── */
-function DropStrip({ status, onMoveTo, visible }) {
-  const { setNodeRef, isOver } = useDroppable({ id: `strip-${status}` });
-  const colors = {
-    planning: { text: 'text-blue-400', bg: 'bg-blue-400/5', border: 'border-blue-400/30' },
-    developing: { text: 'text-amber-400', bg: 'bg-amber-400/5', border: 'border-amber-400/30' },
-    released: { text: 'text-emerald-400', bg: 'bg-emerald-400/5', border: 'border-emerald-400/30' },
-  };
-  const c = colors[status] || colors.planning;
-  return (
-    <div
-      ref={setNodeRef}
-      className={`flex-1 rounded-sm border-2 border-dashed min-h-[60px] flex items-center justify-center text-xs font-semibold transition-all ${c.text} ${c.border} ${c.bg} ${
-        isOver ? 'scale-[1.02] ring-2 ring-hermes-gold/40' : 'opacity-40'
-      }`}
-    >
-      {status}
-    </div>
-  );
-}
-
 /* ── 新建按钮 ── */
 function NewPluginDrop({ onOpen, onDropFile, t }) {
   const { setNodeRef, isOver } = useDroppable({ id: 'new-plugin' });
   const [dragOver, setDragOver] = useState(false);
   return (
-    <button
-      ref={setNodeRef}
-      onClick={onOpen}
+    <button ref={setNodeRef} onClick={onOpen}
       onDragOver={e => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
       onDrop={e => { e.preventDefault(); setDragOver(false);
         const f = Array.from(e.dataTransfer.files); if (f.length) onDropFile(f[0].name.replace(/\.[^.]+$/, '')); }}
-      className={`glass-btn glass-btn-primary flex items-center gap-2 transition-all ${
-        isOver || dragOver ? 'ring-2 ring-hermes-gold scale-105' : ''
-      }`}
+      className={`glass-btn glass-btn-primary flex items-center gap-2 transition-all ${isOver || dragOver ? 'ring-2 ring-hermes-gold scale-105' : ''}`}
     >
       <Plus size={16} /> {isOver || dragOver ? '放入编辑' : t('kanban.new')}
     </button>
@@ -214,18 +137,15 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
   const activeCol = columns.find(c => c.value === activeTab) || columns[0];
   const activePlugin = activeId ? plugins.find(p => p.id === activeId) : null;
 
-  // 拖拽期间展示大面积落点条
-  const dragging = activeId !== null;
-
-  const handleDragStart = useCallback(({ active }) => setActiveId(active.id), []);
-
-  /* ─── handleDragEnd 用 ref 避免 stale closure ─── */
+  /* ── ref 防 stale closure ── */
   const pluginsRef = useRef(plugins);
   pluginsRef.current = plugins;
   const onMoveToRef = useRef(onMoveTo);
   onMoveToRef.current = onMoveTo;
   const onReorderRef = useRef(onReorder);
   onReorderRef.current = onReorder;
+
+  const handleDragStart = useCallback(({ active }) => setActiveId(active.id), []);
 
   const handleDragEnd = useCallback(({ active, over }) => {
     setActiveId(null);
@@ -240,18 +160,22 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       return;
     }
 
-    // 确定目标状态：strip-xxx / grid-xxx / 标签按钮 / 卡片
-    let toStatus = null;
+    // 解析目标状态 — 标签按钮 / 卡片
     const overStr = String(over.id);
-    if (overStr.startsWith('strip-') || overStr.startsWith('grid-'))
-      toStatus = overStr.replace(/^(strip|grid)-/, '');
-    else {
-      const col = STATUSES.find(s => s.value === overStr);
-      if (col) toStatus = col.value;
+    let toStatus = null;
+    const colDef = STATUSES.find(s => s.value === overStr);
+    if (colDef) {
+      toStatus = colDef.value;
+    } else {
+      const card = p.find(pl => pl.id === overStr);
+      if (card) toStatus = card.status;
       else {
-        // 可能是卡片 id → 找它所在的列
-        const card = p.find(pl => pl.id === overStr);
-        if (card) toStatus = card.status;
+        // 兜底：看 active 卡片往哪个方向移（估算相邻列）
+        const plugin = p.find(pl => pl.id === active.id);
+        if (plugin) {
+          const curIdx = STATUSES.findIndex(s => s.value === plugin.status);
+          // 无匹配 — 放弃
+        }
       }
     }
     if (!toStatus) return;
@@ -260,23 +184,21 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     if (!fromPlugin) return;
 
     if (fromPlugin.status === toStatus) {
-      // 同列重排序（仅当 over 是卡片时）
-      if (typeof over.id === 'string' && !overStr.startsWith('strip-') && !overStr.startsWith('grid-')) {
-        const sameCol = p.filter(pl => pl.status === toStatus);
-        const ids = sameCol.map(pl => pl.id);
-        const oldIdx = ids.indexOf(active.id);
-        const newIdx = ids.indexOf(over.id);
-        if (oldIdx !== -1 && newIdx !== -1 && oldIdx !== newIdx)
-          reorder?.(arrayMove(ids, oldIdx, newIdx));
-      }
+      // 同列排序
+      const sameCol = p.filter(pl => pl.status === toStatus);
+      const ids = sameCol.map(pl => pl.id);
+      const oldIdx = ids.indexOf(active.id);
+      const newIdx = ids.indexOf(over.id);
+      if (oldIdx !== -1 && newIdx !== -1 && oldIdx !== newIdx)
+        reorder?.(arrayMove(ids, oldIdx, newIdx));
       return;
     }
 
-    // 跨列移动
+    // 跨列
     const toCol = p.filter(pl => pl.status === toStatus);
     const overIdx = toCol.findIndex(pl => pl.id === over.id);
     move?.(active.id, toStatus, overIdx >= 0 ? overIdx : 999);
-  }, []); // 空 deps — 全靠 ref
+  }, []); // 空 deps，全靠 ref
 
   const openNew = () => { setEditingPlugin(null); setFormOpen(true); };
   const handleEdit = (pl) => { setEditingPlugin(pl); setFormOpen(true); };
@@ -303,8 +225,8 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
 
       <DndContext sensors={sensors} collisionDetection={closestCorners}
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        {/* 标签栏 */}
-        <div className="flex gap-2 mb-2">
+        {/* 标签栏（本身也是 dnd-kit 落点） */}
+        <div className="flex gap-2 mb-4">
           {columns.map(col => (
             <StatusTab key={col.value} col={col}
               active={activeTab === col.value}
@@ -313,33 +235,22 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ))}
         </div>
 
-        {/* 三个大面积落点条（始终渲染，拖拽时显示） */}
-        <div className={`flex gap-2 mb-3 min-h-[70px] transition-all ${dragging ? 'opacity-100' : 'opacity-0 pointer-events-none absolute -z-10'}`}>
-          {STATUSES.map(s => (
-            <DropStrip key={s.value} status={s.value} />
-          ))}
-        </div>
-
-        {/* 网格区 */}
-        <GridDropZone status={activeTab} onExternalDrop={onExternalDrop}>
-          <div className={dragging ? 'pt-0' : 'pt-1'}>
-            {activeCol.items.length === 0 ? (
-              <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
-                拖拽插件到此处
-              </div>
-            ) : (
-              <SortableContext items={activeCol.items.map(p => p.id)} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {activeCol.items.map(plugin => (
-                    <div key={plugin.id} className="group">
-                      <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t} />
-                    </div>
-                  ))}
-                </div>
-              </SortableContext>
-            )}
+        {/* 网格 */}
+        {activeCol.items.length === 0 ? (
+          <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
+            拖拽插件到此处
           </div>
-        </GridDropZone>
+        ) : (
+          <SortableContext items={activeCol.items.map(p => p.id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {activeCol.items.map(plugin => (
+                <div key={plugin.id} className="group">
+                  <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t} />
+                </div>
+              ))}
+            </div>
+          </SortableContext>
+        )}
 
         <DragOverlay>
           {activePlugin ? (
