@@ -100,6 +100,16 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   );
 }
 
+/* ── 网格落点区（标签内空白也可拖入） ── */
+function GridDrop({ status, children }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `grid-${status}` });
+  return (
+    <div ref={setNodeRef} className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03]' : ''}`}>
+      {children}
+    </div>
+  );
+}
+
 /* ── 新建按钮 ── */
 function NewPluginDrop({ onOpen, onDropFile, t }) {
   const { setNodeRef, isOver } = useDroppable({ id: 'new-plugin' });
@@ -160,22 +170,18 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       return;
     }
 
-    // 解析目标状态 — 标签按钮 / 卡片
+    // 解析目标状态 — 标签按钮 / grid-区域 / 卡片
     const overStr = String(over.id);
     let toStatus = null;
-    const colDef = STATUSES.find(s => s.value === overStr);
-    if (colDef) {
-      toStatus = colDef.value;
+    if (overStr.startsWith('grid-')) {
+      toStatus = overStr.slice(5);
     } else {
-      const card = p.find(pl => pl.id === overStr);
-      if (card) toStatus = card.status;
-      else {
-        // 兜底：看 active 卡片往哪个方向移（估算相邻列）
-        const plugin = p.find(pl => pl.id === active.id);
-        if (plugin) {
-          const curIdx = STATUSES.findIndex(s => s.value === plugin.status);
-          // 无匹配 — 放弃
-        }
+      const colDef = STATUSES.find(s => s.value === overStr);
+      if (colDef) {
+        toStatus = colDef.value;
+      } else {
+        const card = p.find(pl => pl.id === overStr);
+        if (card) toStatus = card.status;
       }
     }
     if (!toStatus) return;
@@ -241,22 +247,24 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ))}
         </div>
 
-        {/* 网格 */}
-        {activeCol.items.length === 0 ? (
-          <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
-            拖拽插件到此处
-          </div>
-        ) : (
-          <SortableContext items={activeCol.items.map(p => p.id)} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {activeCol.items.map(plugin => (
-                <div key={plugin.id} className="group">
-                  <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t} />
-                </div>
-              ))}
+        {/* 网格（整块区域可拖放） */}
+        <GridDrop status={activeTab}>
+          {activeCol.items.length === 0 ? (
+            <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
+              拖拽插件到此处
             </div>
-          </SortableContext>
-        )}
+          ) : (
+            <SortableContext items={activeCol.items.map(p => p.id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {activeCol.items.map(plugin => (
+                  <div key={plugin.id} className="group">
+                    <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t} />
+                  </div>
+                ))}
+              </div>
+            </SortableContext>
+          )}
+        </GridDrop>
 
         <DragOverlay>
           {activePlugin ? (
