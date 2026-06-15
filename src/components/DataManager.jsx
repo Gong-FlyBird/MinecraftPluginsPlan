@@ -57,9 +57,9 @@ export default function DataManager({ store, onImport, onReset, t }) {
 
   return (
     <div className="fade-in">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-hermes-text">{t('data.title')}</h1>
-        <p className="text-sm text-hermes-text-muted/60 mt-1">{t('data.subtitle')}</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('data.title')}</h1>
+        <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('data.subtitle')}</p>
       </div>
 
       {message && (
@@ -104,12 +104,12 @@ export default function DataManager({ store, onImport, onReset, t }) {
       </div>
 
       <GlassPanel className="border-red-500/10">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-semibold text-red-400 flex items-center gap-2"><RotateCcw size={16} /> {t('data.danger')}</h3>
             <p className="text-xs text-hermes-text-muted/60 mt-1">{t('data.danger.desc')}</p>
           </div>
-          <button onClick={handleReset} className="glass-btn glass-btn-danger">{t('data.danger.btn')}</button>
+          <button onClick={handleReset} className="glass-btn glass-btn-danger whitespace-nowrap tap-target">{t('data.danger.btn')}</button>
         </div>
       </GlassPanel>
     </div>

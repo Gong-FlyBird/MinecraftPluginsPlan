@@ -27,9 +27,9 @@ export default function TimelineView({ plugins, t }) {
 
   return (
     <div className="fade-in">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-hermes-text">{t('timeline.title')}</h1>
-        <p className="text-sm text-hermes-text-muted/60 mt-1">{t('timeline.subtitle')}</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('timeline.title')}</h1>
+        <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('timeline.subtitle')}</p>
       </div>
 
       <GlassPanel className="mb-6">

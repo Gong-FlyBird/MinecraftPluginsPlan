@@ -17,22 +17,22 @@ export default function Modal({ open, onClose, title, children, wide }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 safe-bottom modal-overlay fade-in modal-overlay-touch"
       onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
     >
       <div
         ref={ref}
-        className={`glass-card max-h-[85vh] overflow-y-auto w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} slide-up`}
+        className={`glass-card max-h-[80vh] md:max-h-[85vh] overflow-y-auto w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} slide-up`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-hermes-border/30">
-          <h2 className="text-lg font-semibold text-hermes-text">{title}</h2>
-          <button onClick={onClose} className="glass-btn !p-2 !border-0 hover:!bg-hermes-gold/8">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-hermes-border/30 sticky top-0 bg-hermes-surface/90 backdrop-blur-sm z-10">
+          <h2 className="text-base sm:text-lg font-semibold text-hermes-text">{title}</h2>
+          <button onClick={onClose} className="glass-btn !p-2 !border-0 hover:!bg-hermes-gold/8 tap-target flex items-center justify-center">
             <X size={16} />
           </button>
         </div>
         {/* Body */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {children}
         </div>
       </div>

@@ -22,9 +22,9 @@ export default function TagManager({ plugins, storeTags, onAddTag, onRemoveTag, 
 
   return (
     <div className="fade-in">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-hermes-text">{t('tag.title')}</h1>
-        <p className="text-sm text-hermes-text-muted/60 mt-1">{t('tag.subtitle')}</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('tag.title')}</h1>
+        <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('tag.subtitle')}</p>
       </div>
 
       <GlassPanel className="mb-6">
@@ -61,33 +61,35 @@ export default function TagManager({ plugins, storeTags, onAddTag, onRemoveTag, 
         </div>
       )}
 
-      <GlassPanel className="mt-6">
+      <GlassPanel className="mt-6 overflow-x-auto">
         <h3 className="text-sm font-semibold text-hermes-text mb-4">{t('tag.distribution')}</h3>
         {plugins.length === 0 ? (
           <p className="text-sm text-hermes-text-muted/40">{t('tag.noData')}</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-[320px]">
             {plugins.map(p => {
               const isExpanded = expandedId === p.id;
               return (
                 <div key={p.id}>
                   {/* 折叠头 */}
                   <div
-                    className="flex items-center gap-2 px-3 py-2 rounded-sm hover:bg-hermes-gold/[0.06] transition-colors cursor-pointer select-none"
+                    className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-sm hover:bg-hermes-gold/[0.06] transition-colors cursor-pointer select-none"
                     onClick={() => setExpandedId(isExpanded ? null : p.id)}
                   >
                     <span className="text-hermes-text-muted/30 flex-shrink-0">
                       {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                     </span>
-                    <span className="text-sm text-hermes-text flex-1">{p.name}</span>
-                    {allTags.map(t => (
-                      <span key={t} className="text-xs text-center w-5 flex-shrink-0">
-                        {(p.tags || []).includes(t)
-                          ? <span className="text-hermes-gold">●</span>
-                          : <span className="text-hermes-border/40">○</span>}
-                      </span>
-                    ))}
-                    <span className="tag text-[10px] ml-auto">{t(`status.${p.status}`)}</span>
+                    <span className="text-sm text-hermes-text truncate flex-1 min-w-0">{p.name}</span>
+                    <span className="flex gap-0.5 sm:gap-1 flex-shrink-0">
+                      {allTags.map(t => (
+                        <span key={t} className="text-xs text-center w-4 sm:w-5">
+                          {(p.tags || []).includes(t)
+                            ? <span className="text-hermes-gold">●</span>
+                            : <span className="text-hermes-border/40">○</span>}
+                        </span>
+                      ))}
+                    </span>
+                    <span className="tag text-[10px] ml-1 sm:ml-auto flex-shrink-0">{t(`status.${p.status}`)}</span>
                   </div>
                   {/* 展开详情 */}
                   {isExpanded && (

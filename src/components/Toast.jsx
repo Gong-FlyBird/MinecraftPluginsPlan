@@ -27,7 +27,7 @@ export default function ToastContainer() {
   if (items.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-[999] flex flex-col gap-2 max-w-sm">
+    <div className="fixed bottom-4 sm:top-4 right-4 left-4 sm:left-auto z-[999] flex flex-col gap-2 sm:max-w-sm">
       {items.map(item => (
         <div
           key={item.id}
@@ -45,7 +45,7 @@ export default function ToastContainer() {
             <AlertCircle size={18} className="text-red-400 flex-shrink-0" />
           ) : null}
           <span className="text-sm text-hermes-text flex-1">{item.text}</span>
-          <button onClick={() => remove(item.id)} className="text-hermes-text-muted/30 hover:text-hermes-text-muted/60 flex-shrink-0">
+          <button onClick={() => remove(item.id)} className="text-hermes-text-muted/30 hover:text-hermes-text-muted/60 flex-shrink-0 tap-target flex items-center justify-center">
             <X size={14} />
           </button>
         </div>

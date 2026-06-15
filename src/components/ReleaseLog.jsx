@@ -65,13 +65,13 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
 
   return (
     <div className="fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-hermes-text">版本发布</h1>
-          <p className="text-sm text-hermes-text-muted/60 mt-1">管理各个插件的版本发布记录</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">版本发布</h1>
+          <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">管理各个插件的版本发布记录</p>
         </div>
         <button onClick={openNewForm}
-          className="glass-btn glass-btn-primary flex items-center gap-2">
+          className="glass-btn glass-btn-primary flex items-center gap-2 whitespace-nowrap">
           <Plus size={16} /> {editingRelease ? '编辑中' : '新版本'}
         </button>
       </div>
@@ -82,7 +82,7 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
           <h3 className="text-sm font-semibold text-hermes-text mb-3">
             {editingRelease ? '编辑发布' : '新建发布'}
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <select value={form.pluginId} onChange={e => setForm(f => ({ ...f, pluginId: e.target.value }))}
               disabled={!!editingRelease}
               className="glass-input glass-select">
@@ -132,8 +132,8 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
                       <span className="text-[10px] text-hermes-text-muted/40">{timeAgo(r.createdAt, t)}</span>
                     </div>
                   </div>
-                  {/* 操作按钮 */}
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                  {/* 操作按钮 - 移动端始终可见 */}
+                  <div className="flex gap-1 flex-shrink-0 touch-actions md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                     <button onClick={e => { e.stopPropagation(); onPinRelease(r._pluginId, r.id); }}
                       className={`glass-btn !p-1.5 !border-0 ${r.pinned ? '!bg-hermes-gold/10' : ''}`}
                       title={r.pinned ? '取消置顶' : '置顶'}>

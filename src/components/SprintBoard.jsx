@@ -33,10 +33,10 @@ export default function SprintBoard({ plugins, t }) {
 
   return (
     <div className="fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-hermes-text">{t('sprint.title')}</h1>
-          <p className="text-sm text-hermes-text-muted/60 mt-1">{t('sprint.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('sprint.title')}</h1>
+          <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('sprint.subtitle')}</p>
         </div>
         <div className="flex gap-1 bg-hermes-gold/8 p-1">
           <button onClick={() => setViewMode('week')}

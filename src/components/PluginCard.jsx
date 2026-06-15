@@ -51,15 +51,15 @@ export default function PluginCard({ plugin, onEdit, onDelete, dragOverlay, t })
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0">v{plugin.version}</span>
 
         <button onClick={e => { e.stopPropagation(); setExpanded(!expanded); }}
-          className="text-hermes-text-muted/30 hover:text-hermes-gold/60 transition-colors flex-shrink-0">
-          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          className="text-hermes-text-muted/30 hover:text-hermes-gold/60 transition-colors flex-shrink-0 tap-target flex items-center justify-center">
+          {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </button>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+        <div className="flex gap-1 flex-shrink-0 touch-actions md:opacity-0 md:group-hover:opacity-100 transition-opacity">
           <button onClick={e => { e.stopPropagation(); onEdit(plugin); }}
-            className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8"><Edit3 size={12} /></button>
+            className="glass-btn !p-1.5 !border-0 hover:!bg-hermes-gold/8 tap-target flex items-center justify-center"><Edit3 size={14} /></button>
           <button onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
-            className="glass-btn-danger !p-1 !border-0"><Trash2 size={12} /></button>
+            className="glass-btn-danger !p-1.5 !border-0 tap-target flex items-center justify-center"><Trash2 size={14} /></button>
         </div>
       </div>
 

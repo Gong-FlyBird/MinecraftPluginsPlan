@@ -43,10 +43,10 @@ export default function IdeaVault({ plugins, storeIdeas, onAddIdea, onUpdateIdea
 
   return (
     <div className="fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-hermes-text">{t('idea.title')}</h1>
-          <p className="text-sm text-hermes-text-muted/60 mt-1">{t('idea.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('idea.title')}</h1>
+          <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('idea.subtitle')}</p>
         </div>
       </div>
 
@@ -61,7 +61,7 @@ export default function IdeaVault({ plugins, storeIdeas, onAddIdea, onUpdateIdea
         <div className="space-y-3">
           <textarea value={newIdea} onChange={e => setNewIdea(e.target.value)}
             className="glass-input min-h-[80px] resize-y" placeholder={t('idea.text.placeholder')} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] text-hermes-text-muted/50 mb-1">{t('idea.link')}</label>
               <input type="text" value={newLink} onChange={e => setNewLink(e.target.value)}
@@ -117,7 +117,7 @@ export default function IdeaVault({ plugins, storeIdeas, onAddIdea, onUpdateIdea
                     </div>
                   </div>
                   <button onClick={(e) => { e.stopPropagation(); onDeleteIdea(idea.id); }}
-                    className="glass-btn-danger !p-1.5 !border-0 opacity-0 hover:opacity-100 transition-opacity"><Trash2 size={13} /></button>
+                    className="glass-btn-danger !p-1.5 !border-0 touch-actions md:opacity-0 md:hover:opacity-100 transition-opacity tap-target flex items-center justify-center"><Trash2 size={14} /></button>
                 </div>
               </div>
 

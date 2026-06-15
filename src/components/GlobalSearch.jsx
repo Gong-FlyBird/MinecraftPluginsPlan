@@ -55,7 +55,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] sm:pt-[15vh] px-4" onClick={onClose}>
       {/* Backdrop */}
       <div className="absolute inset-0 modal-overlay" />
 
@@ -66,7 +66,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
         onKeyDown={handleKey}
       >
         {/* Input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-hermes-border/30">
+        <div className="flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 border-b border-hermes-border/30">
           <Search size={18} className="text-hermes-text-muted/40 flex-shrink-0" />
           <input
             ref={inputRef}
@@ -76,7 +76,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
             placeholder={t('app.search')}
             className="flex-1 bg-transparent border-none outline-none text-base text-hermes-text placeholder:text-hermes-text-muted/30"
           />
-          <button onClick={onClose} className="text-hermes-text-muted/30 hover:text-hermes-text-muted/60">
+          <button onClick={onClose} className="text-hermes-text-muted/30 hover:text-hermes-text-muted/60 tap-target flex items-center justify-center">
             <X size={18} />
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
             {results.map((item, idx) => (
               <button
                 key={`${item.type}-${item.id}`}
-                className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors ${
+                className={`w-full flex items-center gap-3 px-4 sm:px-5 py-3 text-left transition-colors tap-target-nav ${
                   idx === selectedIdx ? 'bg-hermes-gold/[0.08]' : 'hover:bg-hermes-gold/[0.04]'
                 }`}
                 onClick={() => { onClose(); }}
@@ -112,7 +112,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
         )}
 
         {/* Footer hint */}
-        <div className="px-5 py-2 border-t border-hermes-border/30 text-[10px] text-hermes-text-muted/30 flex gap-4">
+        <div className="px-4 sm:px-5 py-2 border-t border-hermes-border/30 text-[10px] text-hermes-text-muted/30 flex gap-3 sm:gap-4 flex-wrap">
           <span>↑↓ 导航</span>
           <span>Enter 选择</span>
           <span>Esc 关闭</span>

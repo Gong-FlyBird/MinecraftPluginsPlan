@@ -50,9 +50,9 @@ export default function StatsDashboard({ plugins, t }) {
 
   return (
     <div className="fade-in">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-hermes-text">{t('stats.title')}</h1>
-        <p className="text-sm text-hermes-text-muted/60 mt-1">{t('stats.subtitle')}</p>
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('stats.title')}</h1>
+        <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('stats.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

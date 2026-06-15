@@ -60,19 +60,21 @@ export default function PluginForm({ open, onClose, onSave, plugin, t: propT }) 
   return (
     <Modal open={open} onClose={onClose} title={isEdit ? t('plugin.edit') : t('plugin.new')}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* 拖入区 */}
-        <div
-          onDragOver={e => { e.preventDefault(); setDropOver(true); }}
-          onDragLeave={() => setDropOver(false)}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-sm p-3 text-center transition-all cursor-default ${
-            dropOver ? 'border-hermes-gold bg-hermes-gold/5 scale-[1.01]' : 'border-hermes-border/30 hover:border-hermes-border/60'
-          }`}
-        >
-          <Upload size={18} className={`mx-auto mb-1 ${dropOver ? 'text-hermes-gold' : 'text-hermes-text-muted/30'}`} />
-          <p className="text-[11px] text-hermes-text-muted/40">
-            {dropOver ? '松开自动填入插件名' : '拖入文件自动填入插件名'}
-          </p>
+        {/* 拖入区 - 仅桌面端显示 */}
+        <div className="hidden sm:block">
+          <div
+            onDragOver={e => { e.preventDefault(); setDropOver(true); }}
+            onDragLeave={() => setDropOver(false)}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-sm p-3 text-center transition-all cursor-default ${
+              dropOver ? 'border-hermes-gold bg-hermes-gold/5 scale-[1.01]' : 'border-hermes-border/30 hover:border-hermes-border/60'
+            }`}
+          >
+            <Upload size={18} className={`mx-auto mb-1 ${dropOver ? 'text-hermes-gold' : 'text-hermes-text-muted/30'}`} />
+            <p className="text-[11px] text-hermes-text-muted/40">
+              {dropOver ? '松开自动填入插件名' : '拖入文件自动填入插件名'}
+            </p>
+          </div>
         </div>
 
         <div>
@@ -81,7 +83,7 @@ export default function PluginForm({ open, onClose, onSave, plugin, t: propT }) 
             className="glass-input" placeholder={t('plugin.name.placeholder')} autoFocus />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-hermes-text-muted mb-1.5">{t('plugin.version')}</label>
             <input type="text" value={form.version} onChange={e => handleChange('version', e.target.value)} className="glass-input" />
@@ -93,7 +95,7 @@ export default function PluginForm({ open, onClose, onSave, plugin, t: propT }) 
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm text-hermes-text-muted mb-1.5">{t('plugin.status')}</label>
             <select value={form.status} onChange={e => handleChange('status', e.target.value)} className="glass-input glass-select">

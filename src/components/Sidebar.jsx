@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ListTodo, Lightbulb, Clock, Database,
-  BarChart3, Target, Tag, ChevronLeft, Package, Settings,
+  BarChart3, Target, Tag, ChevronLeft, Package, Settings, X,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -21,28 +21,42 @@ export default function Sidebar({
   onMouseEnter, onMouseLeave,
   isMobile, onMobileClose,
 }) {
-  const widthClass = collapsed ? 'w-[60px]' : 'w-[220px]';
-  const hiddenClass = autoHide && !visible ? '-translate-x-full' : 'translate-x-0';
+  const widthClass = collapsed ? 'w-[60px]' : isMobile ? 'w-[280px] max-w-[85vw]' : 'w-[220px]';
+  const hiddenClass = isMobile
+    ? (collapsed ? '-translate-x-full' : 'translate-x-0')
+    : (autoHide && !visible ? '-translate-x-full' : 'translate-x-0');
 
   return (
     <>
       {/* 移动端遮罩 */}
       {isMobile && !collapsed && (
-        <div className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden" onClick={onMobileClose} />
+        <div
+          className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm"
+          onClick={onMobileClose}
+        />
       )}
 
       <aside
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass} ${
-          isMobile && collapsed ? '-translate-x-full' : ''
-        }`}
+        className={`fixed left-0 top-0 h-full z-40 transition-transform duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
       >
         <div className="absolute inset-0 sidebar-glass" />
 
       <div className="relative flex flex-col h-full py-4">
+        {/* 移动端关闭按钮 */}
+        {isMobile && !collapsed && (
+          <button
+            onClick={onMobileClose}
+            className="absolute top-3 right-3 w-8 h-8 glass flex items-center justify-center tap-target z-20"
+            aria-label="关闭菜单"
+          >
+            <X size={18} className="text-hermes-text-muted/60" />
+          </button>
+        )}
+
         {/* Logo */}
-        <div className="px-4 mb-8 flex items-center gap-3">
+        <div className={`px-4 mb-8 flex items-center gap-3 ${isMobile && !collapsed ? 'pr-12' : ''}`}>
           <div className="w-8 h-8 bg-hermes-gold/10 border border-hermes-gold/20 flex items-center justify-center flex-shrink-0">
             <Package size={16} className="text-hermes-gold" />
           </div>
@@ -54,15 +68,17 @@ export default function Sidebar({
           )}
         </div>
 
-        {/* Toggle Button */}
-        <button
-          onClick={onToggle}
-          className={`absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10 ${
-            autoHide && !visible ? 'opacity-0 pointer-events-none' : ''
-          }`}
-        >
-          <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
-        </button>
+        {/* Toggle Button - 桌面端专用 */}
+        {!isMobile && (
+          <button
+            onClick={onToggle}
+            className={`absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10 ${
+              autoHide && !visible ? 'opacity-0 pointer-events-none' : ''
+            }`}
+          >
+            <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
+          </button>
+        )}
 
         {/* Nav Items */}
         <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
@@ -72,11 +88,10 @@ export default function Sidebar({
             return (
               <button
                 key={item.id}
-                onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-left ${isActive
-                    ? 'nav-active'
-                    : 'nav-inactive'
-                  }`}
+                onClick={() => { onTabChange(item.id); if (isMobile) onMobileClose?.(); }}
+                className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
+                  isActive ? 'nav-active' : 'nav-inactive'
+                }`}
                 title={collapsed ? t(item.labelKey) : undefined}
               >
                 <Icon size={18} className="flex-shrink-0" />
@@ -94,11 +109,10 @@ export default function Sidebar({
         {/* Settings */}
         <div className="px-2 mt-2">
           <button
-            onClick={onOpenSettings}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-left ${activeTab === 'settings'
-                ? 'nav-active'
-                : 'nav-inactive'
-              }`}
+            onClick={() => { onOpenSettings(); if (isMobile) onMobileClose?.(); }}
+            className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
+              activeTab === 'settings' ? 'nav-active' : 'nav-inactive'
+            }`}
             title={collapsed ? t('sidebar.settings') : undefined}
           >
             <Settings size={18} className="flex-shrink-0" />

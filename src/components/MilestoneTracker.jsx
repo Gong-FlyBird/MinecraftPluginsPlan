@@ -36,10 +36,10 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
 
   return (
     <div className="fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-hermes-text">{t('milestone.title', { name: plugin.name })}</h1>
-          <p className="text-sm text-hermes-text-muted/60 mt-1">{t('milestone.subtitle')}</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('milestone.title', { name: plugin.name })}</h1>
+          <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('milestone.subtitle')}</p>
         </div>
       </div>
 
@@ -53,13 +53,13 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
         </div>
       </GlassPanel>
 
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
         <input type="text" value={newMilestoneTitle}
           onChange={e => setNewMilestoneTitle(e.target.value)}
           className="glass-input flex-1"
           placeholder={t('milestone.addTask')}
           onKeyDown={e => e.key === 'Enter' && handleAddMilestone()} />
-        <button onClick={handleAddMilestone} className="glass-btn glass-btn-primary flex items-center gap-2 whitespace-nowrap">
+        <button onClick={handleAddMilestone} className="glass-btn glass-btn-primary flex items-center gap-2 whitespace-nowrap justify-center tap-target">
           <Plus size={16} /> {t('app.create')}
         </button>
       </div>
@@ -91,7 +91,7 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
                     </div>
                   </div>
                   <button onClick={(e) => { e.stopPropagation(); onDeleteMilestone(plugin.id, m.id); }}
-                    className="glass-btn-danger !p-1.5 !border-0 opacity-0 hover:opacity-100 transition-opacity"><Trash2 size={13} /></button>
+                    className="glass-btn-danger !p-1.5 !border-0 touch-actions md:opacity-0 md:hover:opacity-100 transition-opacity tap-target flex items-center justify-center"><Trash2 size={14} /></button>
                 </div>
 
                 {isExpanded && (
@@ -106,7 +106,7 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
                           <span className={`flex-1 text-sm ${task.done ? 'line-through text-hermes-text-muted/40' : 'text-hermes-text'}`}>{task.text}</span>
                           {task.deadline && <span className="text-[10px] text-hermes-text-muted/40">{formatDate(task.deadline)}</span>}
                           <button onClick={() => onDeleteTask(plugin.id, m.id, task.id)}
-                            className="text-hermes-text-muted/20 hover:text-red-400/60 transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={12} /></button>
+                            className="text-hermes-text-muted/20 hover:text-red-400/60 transition-colors touch-actions md:opacity-0 md:group-hover:opacity-100 tap-target flex items-center justify-center"><Trash2 size={14} /></button>
                         </div>
                       ))}
                     </div>

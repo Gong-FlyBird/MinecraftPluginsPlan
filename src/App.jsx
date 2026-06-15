@@ -109,7 +109,6 @@ export default function App() {
       ? (sidebarVisible ? (sidebarCollapsed ? '60px' : '220px') : '0px')
       : (sidebarCollapsed ? '60px' : '220px')
   );
-  const sidebarOverlay = isMobile && !sidebarCollapsed;
 
   // ── 键盘快捷键 ──
   useEffect(() => {
@@ -141,11 +140,11 @@ export default function App() {
       <div className="bg-orb bg-orb-2" />
       <div className="bg-orb bg-orb-3" />
 
-      {/* 触发区 */}
-      {((autoHide && !sidebarVisible) || isMobile) && (
+      {/* 触发区 - 仅桌面端自动隐藏模式 */}
+      {(autoHide && !sidebarVisible && !isMobile) && (
         <div
           onMouseEnter={handleTriggerEnter}
-          className="fixed left-0 top-0 bottom-0 w-[6px] z-50 cursor-default"
+          className="fixed left-0 top-0 bottom-0 w-[8px] z-50 cursor-default"
         />
       )}
 
@@ -157,8 +156,8 @@ export default function App() {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         pluginCount={plugins.length}
         t={t}
-        onOpenSettings={() => setSettingsOpen(true)}
-        visible={sidebarVisible || isMobile}
+        onOpenSettings={() => { setSettingsOpen(true); if (isMobile) setSidebarCollapsed(true); }}
+        visible={isMobile ? !sidebarCollapsed : sidebarVisible}
         autoHide={autoHide}
         onMouseEnter={handleSidebarEnter}
         onMouseLeave={handleSidebarLeave}
@@ -178,16 +177,15 @@ export default function App() {
 
       {/* Settings Modal */}
       <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings.title')}>
-        <div className="px-6 py-4">
-          <SettingsPanel settings={settings} onUpdate={updateSettings} t={t} />
-        </div>
+        <SettingsPanel settings={settings} onUpdate={updateSettings} t={t} />
       </Modal>
 
-      {/* 移动端汉堡按钮 */}
+      {/* 移动端汉堡按钮 - 仅在侧边栏收起时显示 */}
       {isMobile && sidebarCollapsed && (
         <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="fixed top-4 left-4 z-50 w-10 h-10 glass flex items-center justify-center md:hidden"
+          onClick={() => setSidebarCollapsed(false)}
+          className="fixed top-4 left-4 z-40 w-11 h-11 glass flex items-center justify-center tap-target"
+          aria-label="打开菜单"
         >
           <div className="space-y-1">
             <span className="block w-5 h-[2px] bg-hermes-text rounded" />
@@ -202,7 +200,7 @@ export default function App() {
         style={{ marginLeft: sidebarWidth }}
         className="relative z-10 min-h-screen transition-all duration-300"
       >
-        <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {activeTab === 'kanban' && (
             <KanbanBoard
               plugins={plugins}
@@ -218,8 +216,8 @@ export default function App() {
           )}
 
           {activeTab === 'milestones' && (
-            <div className="flex gap-4">
-              <div className="w-56 flex-shrink-0">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+              <div className="w-full md:w-56 flex-shrink-0">
                 <div className="glass p-3">
                   <h3 className="text-xs font-semibold text-hermes-text-muted/60 uppercase tracking-wider mb-3 px-2">
                     {t('milestone.selectPlugin')}

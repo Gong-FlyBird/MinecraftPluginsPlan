@@ -418,4 +418,22 @@
   }
   .nav-inactive { color: color-mix(in srgb, var(--text) 45%, transparent); border-color: transparent; }
   .nav-inactive:hover { color: var(--text); background: color-mix(in srgb, var(--text) 2%, transparent); }
+
+  /* ── 移动端触控目标 ── */
+  .tap-target { min-width: 44px; min-height: 44px; }
+  .tap-target-nav { min-height: 44px; }
+
+  /* ── 移动端始终可见的操作按钮 ── */
+  .touch-actions { opacity: 1 !important; }
+
+  /* ── iPhone 安全区 ── */
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+
+  /* ── 移动端防止意外滚动关闭 ── */
+  @media (max-width: 767px) {
+    .modal-overlay-touch {
+      overscroll-behavior: contain;
+    }
+  }
 }

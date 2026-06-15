@@ -8,7 +8,7 @@ export default function SettingsPanel({ settings, onUpdate, t }) {
       {/* ── 主题 ── */}
       <div>
         <label className="block text-sm font-semibold text-hermes-text mb-3">{t('settings.theme')}</label>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {THEMES.map(th => (
             <button
               key={th.id}
@@ -39,7 +39,7 @@ export default function SettingsPanel({ settings, onUpdate, t }) {
             <button
               key={ac.id}
               onClick={() => onUpdate({ accent: ac.id })}
-              className={`glass-btn !p-2 !min-w-[48px] flex flex-col items-center gap-1 ${
+              className={`glass-btn !p-2 !min-w-[44px] sm:!min-w-[48px] flex flex-col items-center gap-1 tap-target ${
                 s.accent === ac.id ? 'glass-btn-primary' : ''
               }`}
               title={ac.label[t.code] || ac.label.zh}
