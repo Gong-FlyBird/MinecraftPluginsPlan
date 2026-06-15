@@ -8,7 +8,6 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { Plus, Edit3, Trash2, ChevronDown, Clock } from 'lucide-react';
-import BookmarkButton from './BookmarkButton';
 import PluginForm from './PluginForm';
 import Modal from './Modal';
 import EmptyState from './EmptyState';
@@ -19,8 +18,7 @@ import { toast } from './Toast';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function GridCard({ plugin, onEdit, onDelete, t,
-  bookmarkCollections, onAddPluginToBookmark, onRemovePluginFromBookmark, onAddBookmarkCollection }) {
+function GridCard({ plugin, onEdit, onDelete, t }) {
   const [expanded, setExpanded] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: plugin.id });
@@ -39,11 +37,6 @@ function GridCard({ plugin, onEdit, onDelete, t,
         }`} />
         <span className="flex-1 text-sm font-semibold text-hermes-text truncate min-w-0">{plugin.name}</span>
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
-        <BookmarkButton pluginId={plugin.id} t={t}
-          bookmarkCollections={bookmarkCollections}
-          onAddPluginToBookmark={onAddPluginToBookmark}
-          onRemovePluginFromBookmark={onRemovePluginFromBookmark}
-          onAddBookmarkCollection={onAddBookmarkCollection} />
         <button onClick={e => { e.stopPropagation(); onEdit(plugin); }}
           className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Edit3 size={11} /></button>
         <button onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
@@ -161,11 +154,7 @@ function NewPluginDrop({ onOpen, onDropFile, t }) {
 }
 
 /* ── 主组件 ── */
-export default function KanbanBoard({
-  plugins, highlightPluginId,
-  bookmarkCollections = [], onAddPluginToBookmark, onRemovePluginFromBookmark, onAddBookmarkCollection,
-  onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveTo, onReorder, t, onExternalDrop,
-}) {
+export default function KanbanBoard({ plugins, highlightPluginId, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveTo, onReorder, t, onExternalDrop }) {
   const [activeTab, setActiveTab] = useState('planning');
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState(null);
@@ -313,11 +302,7 @@ export default function KanbanBoard({
                     ref={el => cardRefs.current[plugin.id] = el}
                     className={`group ${plugin.id === highlightPluginId ? 'animate-highlight' : ''}`}
                   >
-                    <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t}
-                      bookmarkCollections={bookmarkCollections}
-                      onAddPluginToBookmark={onAddPluginToBookmark}
-                      onRemovePluginFromBookmark={onRemovePluginFromBookmark}
-                      onAddBookmarkCollection={onAddBookmarkCollection} />
+                    <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t} />
                   </div>
                 ))}
               </div>

@@ -76,8 +76,6 @@ const zh = {
   'sidebar.data.desc': '导入/导出',
   'sidebar.releases': '版本发布',
   'sidebar.releases.desc': '发布历史',
-  'sidebar.bookmarks': '收藏',
-  'sidebar.bookmarks.desc': '我的收藏夹',
   'sidebar.settings': '设置',
 
   /* ── 看板 ── */
@@ -283,8 +281,6 @@ const en = {
   'sidebar.data.desc': 'Import/Export',
   'sidebar.releases': 'Releases',
   'sidebar.releases.desc': 'Release history',
-  'sidebar.bookmarks': 'Bookmarks',
-  'sidebar.bookmarks.desc': 'My collections',
   'sidebar.settings': 'Settings',
 
   'kanban.title': 'Kanban Board',
@@ -476,8 +472,6 @@ const ja = {
   'sidebar.data.desc': 'インポート/エクスポート',
   'sidebar.releases': 'リリース',
   'sidebar.releases.desc': 'リリース履歴',
-  'sidebar.bookmarks': 'ブックマーク',
-  'sidebar.bookmarks.desc': 'コレクション',
   'sidebar.settings': '設定',
 
   'kanban.title': 'プラグインボード',

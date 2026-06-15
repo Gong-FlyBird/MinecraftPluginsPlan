@@ -18,9 +18,6 @@ const INITIAL_STORE = {
     language: 'zh',
     autoHide: false,
   },
-  bookmarkCollections: [
-    { id: 'default', name: '我的收藏', pluginIds: [], createdAt: Date.now() },
-  ],
 };
 
 /** 应用状态 Hook — 所有数据操作集中在此 */
@@ -293,57 +290,6 @@ export function useStore() {
 
   /* ──────── 全局 ──────── */
 
-  /* ──────── 收藏夹 CRUD ──────── */
-
-  const addBookmarkCollection = (name) => {
-    if (!name.trim()) return;
-    setStore(prev => ({
-      ...prev,
-      bookmarkCollections: [
-        ...prev.bookmarkCollections,
-        { id: uid(), name: name.trim(), pluginIds: [], createdAt: Date.now() },
-      ],
-    }));
-  };
-
-  const removeBookmarkCollection = (id) => {
-    setStore(prev => ({
-      ...prev,
-      bookmarkCollections: prev.bookmarkCollections.filter(c => c.id !== id),
-    }));
-  };
-
-  const renameBookmarkCollection = (id, name) => {
-    setStore(prev => ({
-      ...prev,
-      bookmarkCollections: prev.bookmarkCollections.map(c =>
-        c.id === id ? { ...c, name } : c
-      ),
-    }));
-  };
-
-  const addPluginToBookmark = (pluginId, collectionId) => {
-    setStore(prev => ({
-      ...prev,
-      bookmarkCollections: prev.bookmarkCollections.map(c =>
-        c.id === collectionId && !c.pluginIds.includes(pluginId)
-          ? { ...c, pluginIds: [...c.pluginIds, pluginId] }
-          : c
-      ),
-    }));
-  };
-
-  const removePluginFromBookmark = (pluginId, collectionId) => {
-    setStore(prev => ({
-      ...prev,
-      bookmarkCollections: prev.bookmarkCollections.map(c =>
-        c.id === collectionId
-          ? { ...c, pluginIds: c.pluginIds.filter(id => id !== pluginId) }
-          : c
-      ),
-    }));
-  };
-
   const importStore = (data) => {
     const count = data.plugins?.length || 0;
     toast('success', `已导入 ${count} 个插件`);
@@ -375,9 +321,6 @@ export function useStore() {
     addRelease, deleteRelease, updateRelease, pinRelease,
     // Tags
     addTag, removeTag,
-    // Bookmarks
-    addBookmarkCollection, removeBookmarkCollection, renameBookmarkCollection,
-    addPluginToBookmark, removePluginFromBookmark,
     // System
     importStore, resetStore,
     // Settings

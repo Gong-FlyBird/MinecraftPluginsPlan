@@ -5,15 +5,14 @@
  * 加载旧数据时自动执行未完成的迁移。
  */
 
-const CURRENT_VERSION = 2;
+const CURRENT_VERSION = 1;
 
 const MIGRATIONS = {
-  2: (data) => {
-    if (!data.bookmarkCollections) {
-      data.bookmarkCollections = [{ id: 'default', name: '我的收藏', pluginIds: [], createdAt: Date.now() }];
-    }
-    return data;
-  },
+  // 示例: 从 version 0 → 1
+  // 1: (data) => {
+  //   // 迁移逻辑
+  //   return data;
+  // },
 };
 
 /**
