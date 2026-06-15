@@ -1,13 +1,21 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Calendar, Target, CheckCircle2, Clock, ChevronDown, ChevronUp, Tag } from 'lucide-react';
 import GlassPanel from './GlassPanel';
 import EmptyState from './EmptyState';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { calcProgress, timeAgo } from '../utils/helpers';
 
-export default function SprintBoard({ plugins, t }) {
+export default function SprintBoard({ plugins, highlightPluginId, t }) {
   const [viewMode, setViewMode] = useState('week');
   const [expandedId, setExpandedId] = useState(null);
+
+  const sprintRefs = useRef({});
+  useEffect(() => {
+    if (!highlightPluginId) return;
+    requestAnimationFrame(() => {
+      sprintRefs.current[highlightPluginId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [highlightPluginId]);
 
   const sprintData = useMemo(() => {
     const now = Date.now();
@@ -74,6 +82,7 @@ export default function SprintBoard({ plugins, t }) {
                   const isExpanded = expandedId === p.id;
                   const progress = calcProgress(p.milestones);
                   return (
+                    <div ref={el => sprintRefs.current[p.id] = el} className={p.id === highlightPluginId ? 'animate-highlight' : ''}>
                     <GlassPanel key={p.id} className={`!py-3 !px-4 cursor-pointer transition-all ${isExpanded ? '' : 'hover:bg-hermes-gold/[0.06]'}`}>
                       {/* 折叠头 */}
                       <div className="select-none" onClick={() => setExpandedId(isExpanded ? null : p.id)}>
@@ -155,6 +164,7 @@ export default function SprintBoard({ plugins, t }) {
                         </div>
                       )}
                     </GlassPanel>
+                    </div>
                   );
                 })}
               </div>

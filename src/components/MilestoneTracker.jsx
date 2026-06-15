@@ -4,7 +4,7 @@ import GlassPanel from './GlassPanel';
 import EmptyState from './EmptyState';
 import { calcProgress, formatDate } from '../utils/helpers';
 
-export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMilestone, onDeleteMilestone, onToggleTask, onAddTask, onDeleteTask, t }) {
+export default function MilestoneTracker({ plugin, highlightPluginId, onAddMilestone, onUpdateMilestone, onDeleteMilestone, onToggleTask, onAddTask, onDeleteTask, t }) {
   const [expanded, setExpanded] = useState({});
   const [newMilestoneTitle, setNewMilestoneTitle] = useState('');
   const [newTaskText, setNewTaskText] = useState({});
@@ -34,8 +34,10 @@ export default function MilestoneTracker({ plugin, onAddMilestone, onUpdateMiles
     );
   }
 
+  const isHighlighted = highlightPluginId && plugin?.id === highlightPluginId;
+
   return (
-    <div className="fade-in">
+    <div className={`fade-in ${isHighlighted ? 'animate-highlight' : ''}`}>
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('milestone.title', { name: plugin.name })}</h1>

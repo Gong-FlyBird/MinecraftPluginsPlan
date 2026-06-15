@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Tag, X, Search, ChevronDown, ChevronRight } from 'lucide-react';
 import GlassPanel from './GlassPanel';
 import EmptyState from './EmptyState';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { calcProgress, timeAgo } from '../utils/helpers';
 
-export default function TagManager({ plugins, storeTags, onAddTag, onRemoveTag, t }) {
+export default function TagManager({ plugins, highlightPluginId, storeTags, onAddTag, onRemoveTag, t }) {
   const [newTagName, setNewTagName] = useState('');
   const [searchTag, setSearchTag] = useState('');
+  const tagCardRefs = useRef({});
+  useEffect(() => {
+    if (!highlightPluginId) return;
+    requestAnimationFrame(() => {
+      tagCardRefs.current[highlightPluginId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [highlightPluginId]);
   const [expandedId, setExpandedId] = useState(null);
 
   const allTagCounts = {};
@@ -70,7 +77,7 @@ export default function TagManager({ plugins, storeTags, onAddTag, onRemoveTag, 
             {plugins.map(p => {
               const isExpanded = expandedId === p.id;
               return (
-                <div key={p.id}>
+                <div key={p.id} ref={el => tagCardRefs.current[p.id] = el} className={p.id === highlightPluginId ? 'animate-highlight' : ''}>
                   {/* 折叠头 */}
                   <div
                     className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-sm hover:bg-hermes-gold/[0.06] transition-colors cursor-pointer select-none"

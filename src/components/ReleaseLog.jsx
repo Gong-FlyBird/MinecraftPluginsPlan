@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Plus, Package, Clock, Trash2, Edit3, Pin, PinOff, ChevronDown, ChevronRight } from 'lucide-react';
 import GlassPanel from './GlassPanel';
 import Modal from './Modal';
@@ -6,12 +6,19 @@ import EmptyState from './EmptyState';
 import { timeAgo } from '../utils/helpers';
 import { toast } from '../components/Toast';
 
-export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onUpdateRelease, onPinRelease, t }) {
+export default function ReleaseLog({ plugins, highlightPluginId, onAddRelease, onDeleteRelease, onUpdateRelease, onPinRelease, t }) {
   const [expanded, setExpanded] = useState({});
   const [formVisible, setFormVisible] = useState(false);
   const [editingRelease, setEditingRelease] = useState(null);
   const [form, setForm] = useState({ pluginId: '', version: '', title: '', notes: '' });
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const releaseRefs = useRef({});
+  useEffect(() => {
+    if (!highlightPluginId) return;
+    requestAnimationFrame(() => {
+      releaseRefs.current[highlightPluginId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [highlightPluginId]);
 
   const allReleases = useMemo(() => {
     const releases = [];
@@ -112,7 +119,9 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
         <div className="space-y-3">
           {allReleases.map(r => {
             const isExpanded = expanded[r.id];
+            const isReleaseHighlight = highlightPluginId && r._pluginId === highlightPluginId;
             return (
+              <div ref={el => releaseRefs.current[r._pluginId] = el} className={isReleaseHighlight ? 'animate-highlight' : ''}>
               <GlassPanel key={r.id} className={`!p-0 overflow-hidden group ${r.pinned ? 'ring-1 ring-hermes-gold/30' : ''}`}>
                 <div className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-hermes-gold/[0.06] transition-colors"
                   onClick={() => setExpanded(p => ({ ...p, [r.id]: !p[r.id] }))}>
@@ -155,6 +164,7 @@ export default function ReleaseLog({ plugins, onAddRelease, onDeleteRelease, onU
                   </div>
                 )}
               </GlassPanel>
+              </div>
             );
           })}
         </div>

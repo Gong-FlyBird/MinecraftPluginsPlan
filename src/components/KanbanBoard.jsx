@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
   DndContext, DragOverlay, closestCorners, pointerWithin, KeyboardSensor,
   PointerSensor, useSensor, useSensors, useDroppable,
@@ -154,12 +154,26 @@ function NewPluginDrop({ onOpen, onDropFile, t }) {
 }
 
 /* ── 主组件 ── */
-export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveTo, onReorder, t, onExternalDrop }) {
+export default function KanbanBoard({ plugins, highlightPluginId, onAddPlugin, onUpdatePlugin, onDeletePlugin, onMoveTo, onReorder, t, onExternalDrop }) {
   const [activeTab, setActiveTab] = useState('planning');
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlugin, setEditingPlugin] = useState(null);
   const [activeId, setActiveId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+
+  // 搜索高亮：滚动到目标插件卡片
+  const cardRefs = useRef({});
+  useEffect(() => {
+    if (!highlightPluginId) return;
+    // 先确保该标签已激活
+    const plugin = plugins.find(p => p.id === highlightPluginId);
+    if (plugin && plugin.status !== activeTab) setActiveTab(plugin.status);
+    // 等待渲染后滚动
+    requestAnimationFrame(() => {
+      const el = cardRefs.current[highlightPluginId];
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [highlightPluginId]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -283,7 +297,11 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
             <SortableContext items={activeCol.items.map(p => p.id)} strategy={rectSortingStrategy}>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {activeCol.items.map(plugin => (
-                  <div key={plugin.id} className="group">
+                  <div
+                    key={plugin.id}
+                    ref={el => cardRefs.current[plugin.id] = el}
+                    className={`group ${plugin.id === highlightPluginId ? 'animate-highlight' : ''}`}
+                  >
                     <GridCard plugin={plugin} onEdit={handleEdit} onDelete={handleDeleteClick} t={t} />
                   </div>
                 ))}

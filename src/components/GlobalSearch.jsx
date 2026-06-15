@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Search, X, Package, Tag, Lightbulb } from 'lucide-react';
 
-export default function GlobalSearch({ open, onClose, plugins, t }) {
+export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
   const [query, setQuery] = useState('');
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef(null);
@@ -46,9 +46,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
     if (e.key === 'ArrowDown') { e.preventDefault(); setSelectedIdx(i => Math.min(i + 1, results.length - 1)); }
     if (e.key === 'ArrowUp') { e.preventDefault(); setSelectedIdx(i => Math.max(i - 1, 0)); }
     if (e.key === 'Enter' && results[selectedIdx]) {
-      onClose();
-      // Navigate to plugin in kanban
-      // For now just close - could switch tab and select
+      onSelect?.(results[selectedIdx]);
     }
   };
 
@@ -90,7 +88,7 @@ export default function GlobalSearch({ open, onClose, plugins, t }) {
                 className={`w-full flex items-center gap-3 px-4 sm:px-5 py-3 text-left transition-colors tap-target-nav ${
                   idx === selectedIdx ? 'bg-hermes-gold/[0.08]' : 'hover:bg-hermes-gold/[0.04]'
                 }`}
-                onClick={() => { onClose(); }}
+                onClick={() => { onSelect?.(item); }}
               >
                 <span className="flex-shrink-0">
                   {item.type === 'plugin' ? <Package size={16} className="text-hermes-gold" /> :

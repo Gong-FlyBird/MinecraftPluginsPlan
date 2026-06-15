@@ -23,6 +23,7 @@ export default function App() {
   const [selectedPluginId, setSelectedPluginId] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
+  const [highlightPluginId, setHighlightPluginId] = useState(null);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const hideTimer = useRef(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -68,6 +69,18 @@ export default function App() {
     () => plugins.find(p => p.id === selectedPluginId) || plugins[0] || null,
     [plugins, selectedPluginId]
   );
+
+  /** 搜索选中：跳转到对应页面并高亮 */
+  const handleSearchResult = useCallback(({ type, id }) => {
+    setGlobalSearchOpen(false);
+    if (type === 'plugin' || type === 'tag' || type === 'idea') {
+      setHighlightPluginId(id);
+      if (type === 'plugin') { setActiveTab('kanban'); setSelectedPluginId(id); }
+      else if (type === 'tag') { setActiveTab('tags'); }
+      else if (type === 'idea') { setActiveTab('milestones'); setSelectedPluginId(id); }
+      setTimeout(() => setHighlightPluginId(null), 2500);
+    }
+  }, []);
 
   const handleTabChange = (tab) => {
     if (tab === 'settings') { setSettingsOpen(true); return; }
@@ -179,6 +192,7 @@ export default function App() {
       <GlobalSearch
         open={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
+        onSelect={handleSearchResult}
         plugins={plugins}
         t={t}
       />
@@ -222,6 +236,7 @@ export default function App() {
           {activeTab === 'kanban' && (
             <KanbanBoard
               plugins={plugins}
+              highlightPluginId={highlightPluginId}
               onAddPlugin={addPlugin}
               onUpdatePlugin={updatePlugin}
               onDeletePlugin={handleDeletePlugin}
@@ -258,6 +273,7 @@ export default function App() {
               <div className="flex-1">
                 <MilestoneTracker
                   plugin={selectedPlugin}
+                  highlightPluginId={highlightPluginId}
                   onAddMilestone={addMilestone}
                   onUpdateMilestone={updateMilestone}
                   onDeleteMilestone={deleteMilestone}
@@ -270,7 +286,7 @@ export default function App() {
             </div>
           )}
 
-          {activeTab === 'sprint' && <SprintBoard plugins={plugins} t={t} />}
+          {activeTab === 'sprint' && <SprintBoard plugins={plugins} highlightPluginId={highlightPluginId} t={t} />}
           {activeTab === 'ideas' && (
             <IdeaVault
               plugins={plugins} storeIdeas={standaloneIdeas}
@@ -282,7 +298,7 @@ export default function App() {
           {activeTab === 'stats' && <StatsDashboard plugins={plugins} t={t} />}
           {activeTab === 'releases' && (
             <ReleaseLog
-              plugins={plugins}
+              plugins={plugins} highlightPluginId={highlightPluginId}
               onAddRelease={addRelease}
               onDeleteRelease={deleteRelease}
               onUpdateRelease={updateRelease}
@@ -292,7 +308,7 @@ export default function App() {
           )}
           {activeTab === 'tags' && (
             <TagManager
-              plugins={plugins} storeTags={store.tags || []}
+              plugins={plugins} highlightPluginId={highlightPluginId} storeTags={store.tags || []}
               onAddTag={addTag} onRemoveTag={removeTag} t={t}
             />
           )}
