@@ -7,8 +7,7 @@ import {
   SortableContext, sortableKeyboardCoordinates, rectSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { Plus, Edit3, Trash2, ChevronDown, Clock } from 'lucide-react';
-import BookmarkButton from './BookmarkButton';
+import { Plus, Edit3, Trash2, ChevronDown, Clock, Bookmark, BookmarkCheck } from 'lucide-react';
 import PluginForm from './PluginForm';
 import Modal from './Modal';
 import EmptyState from './EmptyState';
@@ -22,10 +21,31 @@ import { CSS } from '@dnd-kit/utilities';
 function GridCard({ plugin, onEdit, onDelete, t,
   bookmarkCollections = [], onAddPluginToBookmark, onRemovePluginFromBookmark, onAddBookmarkCollection }) {
   const [expanded, setExpanded] = useState(false);
+  const [bmCreating, setBmCreating] = useState(false);
+  const [bmNewName, setBmNewName] = useState('');
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: plugin.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
   const progress = calcProgress(plugin.milestones);
+
+  const inBookmarks = bookmarkCollections
+    .filter(c => c.pluginIds.includes(plugin.id))
+    .map(c => c.id);
+
+  const toggleBookmark = (colId) => {
+    if (inBookmarks.includes(colId)) {
+      onRemovePluginFromBookmark?.(plugin.id, colId);
+    } else {
+      onAddPluginToBookmark?.(plugin.id, colId);
+    }
+  };
+
+  const handleBmCreate = () => {
+    if (!bmNewName.trim()) return;
+    onAddBookmarkCollection?.(bmNewName.trim());
+    setBmNewName('');
+    setBmCreating(false);
+  };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}
@@ -37,13 +57,19 @@ function GridCard({ plugin, onEdit, onDelete, t,
           plugin.status === 'planning' ? 'bg-blue-400' :
           plugin.status === 'developing' ? 'bg-amber-400' : 'bg-emerald-400'
         }`} />
-        <span className="flex-1 text-sm font-semibold text-hermes-text break-all min-w-0 leading-tight">{plugin.name}</span>
+        <span className={`flex-1 text-sm font-semibold text-hermes-text min-w-0 leading-tight ${
+          expanded ? 'break-all' : 'truncate'
+        }`}>{plugin.name}</span>
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
-        <BookmarkButton pluginId={plugin.id} pluginName={plugin.name}
-          bookmarkCollections={bookmarkCollections}
-          onAddPluginToBookmark={onAddPluginToBookmark}
-          onRemovePluginFromBookmark={onRemovePluginFromBookmark}
-          onAddBookmarkCollection={onAddBookmarkCollection} />
+        <button onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
+          className={`glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 transition-opacity flex-shrink-0 ${
+            inBookmarks.length > 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`} title="收藏">
+          {inBookmarks.length > 0
+            ? <BookmarkCheck size={11} className="text-hermes-gold" />
+            : <Bookmark size={11} className="text-hermes-text-muted/40" />
+          }
+        </button>
         <button onClick={e => { e.stopPropagation(); onEdit(plugin); }}
           className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Edit3 size={11} /></button>
         <button onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
@@ -51,7 +77,52 @@ function GridCard({ plugin, onEdit, onDelete, t,
         <ChevronDown size={11} className={`text-hermes-text-muted/20 flex-shrink-0 transition-transform ${expanded ? '' : 'rotate-180'}`} />
       </div>
       {expanded && (
-        <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-2 pt-2">
+        <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-3 pt-3" onClick={e => e.stopPropagation()}>
+          {/* ── 收藏夹——和查看详情一样的下拉结构 ── */}
+          <div>
+            <p className="text-[11px] text-hermes-text-muted/50 mb-2 flex items-center gap-1">
+              <Bookmark size={12} className="text-hermes-gold" /> 收藏到：
+            </p>
+            <div className="space-y-1">
+              {bookmarkCollections.map(c => {
+                const checked = inBookmarks.includes(c.id);
+                return (
+                  <label key={c.id}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-sm cursor-pointer transition-colors text-xs ${
+                      checked ? 'bg-hermes-gold/10' : 'hover:bg-hermes-gold/[0.04]'
+                    }`}
+                  >
+                    <input type="checkbox" checked={checked}
+                      onChange={() => toggleBookmark(c.id)}
+                      className="accent-hermes-gold w-3.5 h-3.5 rounded border-hermes-border/40 flex-shrink-0" />
+                    <span className={`flex-1 min-w-0 ${checked ? 'text-hermes-gold font-medium' : 'text-hermes-text-muted/70'}`}>
+                      {c.name}
+                    </span>
+                    <span className="text-hermes-text-muted/40">{c.pluginIds.length}</span>
+                  </label>
+                );
+              })}
+            </div>
+            {bmCreating ? (
+              <div className="flex gap-1 mt-2">
+                <input autoFocus value={bmNewName}
+                  onChange={e => setBmNewName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleBmCreate(); if (e.key === 'Escape') { setBmCreating(false); setBmNewName(''); } }}
+                  className="glass-input !py-1 !px-2 text-xs flex-1" placeholder="收藏夹名称" />
+                <button onClick={handleBmCreate} className="glass-btn !py-1 !px-2 text-xs">创建</button>
+                <button onClick={() => { setBmCreating(false); setBmNewName(''); }} className="glass-btn !py-1 !px-2 text-xs">取消</button>
+              </div>
+            ) : (
+              <button onClick={() => setBmCreating(true)}
+                className="text-xs text-hermes-gold hover:text-hermes-gold/80 mt-1 flex items-center gap-1">
+                <Plus size={12} /> 新建收藏夹
+              </button>
+            )}
+          </div>
+
+          <hr className="border-hermes-border/20" />
+
+          {/* ── 插件详情 ── */}
           <div className="flex items-center gap-2 flex-wrap">
             <StatusBadge status={plugin.status} t={t} />
             <PriorityBadge priority={plugin.priority} t={t} />
@@ -68,7 +139,7 @@ function GridCard({ plugin, onEdit, onDelete, t,
               <div className="progress-bar h-1.5"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
             </div>
           )}
-          {plugin.description && <p className="text-xs text-hermes-text-muted/70 line-clamp-3">{plugin.description}</p>}
+          {plugin.description && <p className="text-xs text-hermes-text-muted/70 break-all">{plugin.description}</p>}
           <div className="flex items-center gap-1 text-[10px] text-hermes-text-muted/40 pt-1">
             <Clock size={9} /><span>{timeAgo(plugin.updatedAt, t)}</span>
           </div>
