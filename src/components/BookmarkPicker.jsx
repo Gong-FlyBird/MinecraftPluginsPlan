@@ -39,7 +39,7 @@ export default function BookmarkPicker({
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="收藏到" wide={false}>
+    <Modal open={open} onClose={onClose} title="收藏到" wide>
       <div className="space-y-1">
         {pluginName && (
           <p className="text-xs text-gray-400 mb-3">
