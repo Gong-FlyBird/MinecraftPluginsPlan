@@ -84,9 +84,14 @@ export default function App() {
   };
 
   /** 从外部拖入文件创建插件 */
+  const _dropOnce = useRef(0);
   const handleExternalDrop = (name, status) => {
     addPlugin({ name, status, priority: 'external' });
-    toast('success', `已从外部导入：${name}`);
+    _dropOnce.current++;
+    if (_dropOnce.current === 1) {
+      toast('success', `已从外部导入：${name}`);
+      setTimeout(() => { _dropOnce.current = 0; }, 2000);
+    }
   };
 
   // ── 自动隐藏侧边栏 ──
