@@ -1,8 +1,11 @@
 import { useState, useMemo, useRef } from 'react';
-import { Bookmark, Plus, X, Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import {
+  Bookmark, BookmarkCheck, Plus, X, Search, ChevronLeft, ChevronRight, Trash2,
+  Edit3, Clock, ChevronDown,
+} from 'lucide-react';
 import GlassPanel from './GlassPanel';
-import { StatusBadge } from './StatusBadge';
-import { calcProgress } from '../utils/helpers';
+import { StatusBadge, PriorityBadge } from './StatusBadge';
+import { calcProgress, timeAgo } from '../utils/helpers';
 
 /* ── 收藏夹行 ── */
 function CollectionRow({ collections, activeId, onSelect, onDelete, onAdd }) {
@@ -90,34 +93,135 @@ function AddCollectionCard({ onAdd }) {
   );
 }
 
-/* ── 收藏夹内插件卡片 ── */
-function BookmarkPluginCard({ plugin, onRemove, collectionId, t }) {
+/* ── 收藏夹内插件卡片（与插件看板 GridCard 一致） ── */
+function BookmarkPluginCard({
+  plugin, onRemove, onEdit, collectionId, t,
+  bookmarkCollections, onAddPluginToBookmark, onRemovePluginFromBookmark, onAddBookmarkCollection,
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [bmCreating, setBmCreating] = useState(false);
+  const [bmNewName, setBmNewName] = useState('');
   const progress = calcProgress(plugin.milestones);
-  const statusColors = { planning: 'bg-blue-400', developing: 'bg-amber-400', released: 'bg-emerald-400' };
-  const sc = statusColors[plugin.status] || 'bg-gray-400';
+
+  const inBookmarks = bookmarkCollections
+    .filter(c => c.pluginIds.includes(plugin.id))
+    .map(c => c.id);
+
+  const toggleBookmark = (colId) => {
+    if (inBookmarks.includes(colId)) {
+      onRemovePluginFromBookmark?.(plugin.id, colId);
+    } else {
+      onAddPluginToBookmark?.(plugin.id, colId);
+    }
+  };
+
+  const handleBmCreate = () => {
+    if (!bmNewName.trim()) return;
+    onAddBookmarkCollection?.(bmNewName.trim());
+    setBmNewName('');
+    setBmCreating(false);
+  };
 
   return (
-    <div className="group glass-card px-3 py-2.5 flex items-center gap-2">
-      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${sc}`} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-hermes-text break-all leading-tight">{plugin.name}</span>
-          <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
-          <StatusBadge status={plugin.status} t={t} />
-        </div>
-        {plugin.milestones?.length > 0 && (
-          <div className="flex items-center gap-2 mt-0.5">
-            <div className="progress-bar h-1 flex-1 max-w-[120px]">
-              <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
-            </div>
-            <span className="text-[10px] text-hermes-text-muted/50">{progress}%</span>
-          </div>
+    <div className={`glass-card overflow-hidden transition-all ${expanded ? '' : 'hover:bg-hermes-gold/[0.04]'}`}>
+      <div onClick={() => setExpanded(!expanded)}
+        className="px-3 py-2.5 flex items-center gap-2 min-w-0 cursor-pointer"
+      >
+        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
+          plugin.status === 'planning' ? 'bg-blue-400' :
+          plugin.status === 'developing' ? 'bg-amber-400' : 'bg-emerald-400'
+        }`} />
+        <span className={`flex-1 text-sm font-semibold text-hermes-text min-w-0 leading-tight ${
+          expanded ? 'break-all' : 'truncate'
+        }`}>{plugin.name}</span>
+        <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
+        <button onClick={e => { e.stopPropagation(); setExpanded(v => !v); }}
+          className={`glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 transition-opacity flex-shrink-0 ${
+            inBookmarks.length > 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`} title="收藏">
+          {inBookmarks.length > 0
+            ? <BookmarkCheck size={11} className="text-hermes-gold" />
+            : <Bookmark size={11} className="text-hermes-text-muted/40" />
+          }
+        </button>
+        {onEdit && (
+          <button onClick={e => { e.stopPropagation(); onEdit(plugin); }}
+            className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Edit3 size={11} /></button>
         )}
+        <button onClick={e => { e.stopPropagation(); onRemove(plugin.id, collectionId); }}
+          className="glass-btn !p-1 !border-0 hover:!bg-red-400/10 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><X size={11} className="text-red-400/60" /></button>
+        <ChevronDown size={11} className={`text-hermes-text-muted/20 flex-shrink-0 transition-transform ${expanded ? '' : 'rotate-180'}`} />
       </div>
-      <button onClick={() => onRemove(plugin.id, collectionId)}
-        className="opacity-0 group-hover:opacity-100 glass-btn !p-1 !border-0 transition-opacity flex-shrink-0" title="移出收藏夹">
-        <X size={11} className="text-red-400/60" />
-      </button>
+
+      {expanded && (
+        <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-3 pt-3 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
+          {/* 收藏夹 */}
+          <div>
+            <p className="text-[11px] text-hermes-text-muted/50 mb-2 flex items-center gap-1">
+              <Bookmark size={12} className="text-hermes-gold" /> 收藏到：
+            </p>
+            <div className="space-y-1">
+              {bookmarkCollections.map(c => {
+                const checked = inBookmarks.includes(c.id);
+                return (
+                  <label key={c.id}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-sm cursor-pointer transition-colors text-xs ${
+                      checked ? 'bg-hermes-gold/10' : 'hover:bg-hermes-gold/[0.04]'
+                    }`}
+                  >
+                    <input type="checkbox" checked={checked}
+                      onChange={() => toggleBookmark(c.id)}
+                      className="accent-hermes-gold w-3.5 h-3.5 rounded border-hermes-border/40 flex-shrink-0" />
+                    <span className={`flex-1 min-w-0 ${checked ? 'text-hermes-gold font-medium' : 'text-hermes-text-muted/70'}`}>
+                      {c.name}
+                    </span>
+                    <span className="text-hermes-text-muted/40">{c.pluginIds.length}</span>
+                  </label>
+                );
+              })}
+            </div>
+            {bmCreating ? (
+              <div className="flex gap-1 mt-2">
+                <input autoFocus value={bmNewName}
+                  onChange={e => setBmNewName(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleBmCreate(); if (e.key === 'Escape') { setBmCreating(false); setBmNewName(''); } }}
+                  className="glass-input !py-1 !px-2 text-xs flex-1" placeholder="收藏夹名称" />
+                <button onClick={handleBmCreate} className="glass-btn !py-1 !px-2 text-xs">创建</button>
+                <button onClick={() => { setBmCreating(false); setBmNewName(''); }} className="glass-btn !py-1 !px-2 text-xs">取消</button>
+              </div>
+            ) : (
+              <button onClick={() => setBmCreating(true)}
+                className="text-xs text-hermes-gold hover:text-hermes-gold/80 mt-1 flex items-center gap-1">
+                <Plus size={12} /> 新建收藏夹
+              </button>
+            )}
+          </div>
+
+          <hr className="border-hermes-border/20" />
+
+          {/* 插件详情 */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <StatusBadge status={plugin.status} t={t} />
+            <PriorityBadge priority={plugin.priority} t={t} />
+            <span className="text-xs text-hermes-text-muted/50">MC {plugin.mcVersion}</span>
+          </div>
+          {plugin.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1">{plugin.tags.map((tag, i) => <span key={i} className="tag text-[10px]">{tag}</span>)}</div>
+          )}
+          {plugin.milestones?.length > 0 && (
+            <div>
+              <div className="flex justify-between text-[10px] text-hermes-text-muted/60 mb-0.5">
+                <span>{t('app.progress')}</span><span>{progress}%</span>
+              </div>
+              <div className="progress-bar h-1.5"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
+            </div>
+          )}
+          {plugin.description && <p className="text-xs text-hermes-text-muted/70 break-all">{plugin.description}</p>}
+          <div className="flex items-center gap-1 text-[10px] text-hermes-text-muted/40 pt-1">
+            <Clock size={9} /><span>{timeAgo(plugin.updatedAt, t)}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -131,13 +235,11 @@ export default function BookmarkManager({
   const [activeColId, setActiveColId] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 当前活动收藏夹 — 三级兜底，不用 useEffect
   const activeCol = bookmarkCollections.find(c => c.id === activeColId)
                  || bookmarkCollections[0]
                  || null;
   const activePluginIds = activeCol?.pluginIds || [];
 
-  // 过滤后的插件列表
   const activePlugins = useMemo(() => {
     let list = plugins.filter(p => activePluginIds.includes(p.id));
     if (searchQuery.trim()) {
@@ -149,13 +251,11 @@ export default function BookmarkManager({
 
   return (
     <div className="fade-in">
-      {/* 1. 标题 */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">收藏</h1>
         <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">管理你收藏的插件</p>
       </div>
 
-      {/* 2. 搜索 */}
       <div className="relative mb-4">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-hermes-text-muted/30" />
         <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
@@ -168,13 +268,11 @@ export default function BookmarkManager({
         )}
       </div>
 
-      {/* 3. 收藏夹行 */}
       <CollectionRow collections={bookmarkCollections} activeId={activeCol?.id}
         onSelect={id => setActiveColId(id)}
         onDelete={(id) => { onRemoveCollection(id); if (activeColId === id) setActiveColId('default'); }}
         onAdd={onAddCollection} />
 
-      {/* 4. 收藏夹内容 */}
       <GlassPanel className="!p-3 sm:!p-4">
         <div className="flex items-center gap-2 mb-3">
           <Bookmark size={14} className="text-hermes-gold flex-shrink-0" />
@@ -194,7 +292,11 @@ export default function BookmarkManager({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {activePlugins.map(p => (
               <BookmarkPluginCard key={p.id} plugin={p}
-                collectionId={activeCol.id} onRemove={onRemovePlugin} t={t} />
+                collectionId={activeCol.id} onRemove={onRemovePlugin} t={t}
+                bookmarkCollections={bookmarkCollections}
+                onAddPluginToBookmark={onAddPlugin}
+                onRemovePluginFromBookmark={onRemovePlugin}
+                onAddBookmarkCollection={onAddCollection} />
             ))}
           </div>
         )}
