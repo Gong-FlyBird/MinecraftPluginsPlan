@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useStore } from './utils/store';
 import { useT } from './utils/i18n';
+import { Search } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import KanbanBoard from './components/KanbanBoard';
 import MilestoneTracker from './components/MilestoneTracker';
@@ -208,6 +209,16 @@ export default function App() {
         className="relative z-10 min-h-screen transition-all duration-300"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          {/* 搜索按钮（每个页面通用） */}
+          <button
+            onClick={() => setGlobalSearchOpen(true)}
+            className="fixed bottom-6 right-6 z-40 w-12 h-12 glass flex items-center justify-center rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all tap-target"
+            aria-label={t('app.search')}
+            title={t('app.search')}
+          >
+            <Search size={20} className="text-hermes-gold" />
+          </button>
+
           {activeTab === 'kanban' && (
             <KanbanBoard
               plugins={plugins}
