@@ -325,7 +325,24 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
   };
 
   return (
-    <div className="fade-in">
+    <div
+      onDragOver={handlePageDragOver}
+      onDragLeave={handlePageDragLeave}
+      onDrop={handlePageDrop}
+      className="fade-in relative"
+    >
+      {/* 全屏拖入浮层 */}
+      {pageDragOver && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 bg-hermes-gold/5 backdrop-blur-sm" />
+          <div className="relative glass-card px-10 py-8 text-center shadow-gold ring-2 ring-hermes-gold/50 scale-110">
+            <span className="text-xl font-bold text-hermes-gold">松手放入插件</span>
+            <p className="text-sm text-hermes-text-muted/60 mt-2">
+              将自动添加到「{t(`kanban.${activeTab}`)}」
+            </p>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('kanban.title')}</h1>
@@ -334,25 +351,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
         <NewPluginDrop onOpen={openNew} onDropFile={handleExternalFileOnNew} t={t} />
       </div>
 
-      {/* 全屏外部位拖放区 */}
-      <div
-        onDragOver={handlePageDragOver}
-        onDragLeave={handlePageDragLeave}
-        onDrop={handlePageDrop}
-        className="relative"
-      >
-        {/* 全屏拖入浮层 */}
-        {pageDragOver && (
-          <div className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none">
-            <div className="absolute inset-0 bg-hermes-gold/5 backdrop-blur-sm" />
-            <div className="relative glass-card px-10 py-8 text-center shadow-gold ring-2 ring-hermes-gold/50 scale-110">
-              <span className="text-xl font-bold text-hermes-gold">松手放入插件</span>
-              <p className="text-sm text-hermes-text-muted/60 mt-2">
-                将自动添加到「{t(`kanban.${activeTab}`)}」
-              </p>
-            </div>
-          </div>
-        )}
+
 
       <DndContext sensors={sensors} collisionDetection={closestCorners}
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -410,7 +409,6 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ) : null}
         </DragOverlay>
       </DndContext>
-      </div>
 
       <PluginForm open={formOpen} onClose={handleClose} onSave={handleSave} plugin={editingPlugin} t={t} />
 

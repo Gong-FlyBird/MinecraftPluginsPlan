@@ -77,10 +77,8 @@ export default function App() {
   };
 
   const handleDeletePlugin = (id) => {
-    if (window.confirm(t('confirm.deletePlugin'))) {
-      deletePlugin(id);
-      if (selectedPluginId === id) setSelectedPluginId(null);
-    }
+    deletePlugin(id);
+    if (selectedPluginId === id) setSelectedPluginId(null);
   };
 
   /** 从外部拖入文件创建插件 */
