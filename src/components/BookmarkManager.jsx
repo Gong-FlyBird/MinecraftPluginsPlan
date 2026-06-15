@@ -101,8 +101,8 @@ function BookmarkPluginCard({ plugin, onRemove, collectionId, t }) {
       <span className={`w-2 h-2 rounded-full flex-shrink-0 ${sc}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-hermes-text truncate">{plugin.name}</span>
-          <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0">v{plugin.version}</span>
+          <span className="text-sm font-semibold text-hermes-text break-all leading-tight">{plugin.name}</span>
+          <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
           <StatusBadge status={plugin.status} t={t} />
         </div>
         {plugin.milestones?.length > 0 && (

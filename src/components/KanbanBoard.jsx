@@ -37,7 +37,7 @@ function GridCard({ plugin, onEdit, onDelete, t,
           plugin.status === 'planning' ? 'bg-blue-400' :
           plugin.status === 'developing' ? 'bg-amber-400' : 'bg-emerald-400'
         }`} />
-        <span className="flex-1 text-sm font-semibold text-hermes-text truncate min-w-0">{plugin.name}</span>
+        <span className="flex-1 text-sm font-semibold text-hermes-text break-all min-w-0 leading-tight">{plugin.name}</span>
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
         <BookmarkButton pluginId={plugin.id} pluginName={plugin.name}
           bookmarkCollections={bookmarkCollections}
