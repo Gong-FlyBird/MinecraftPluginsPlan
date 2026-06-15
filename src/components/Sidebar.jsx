@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ListTodo, Lightbulb, Clock, Database,
-  BarChart3, Target, Tag, ChevronLeft, Package, Settings, X,
+  BarChart3, Target, Tag, ChevronLeft, Package, Settings, X, Bookmark,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { id: 'tags', labelKey: 'sidebar.tags', icon: Tag, descKey: 'sidebar.tags.desc' },
   { id: 'data', labelKey: 'sidebar.data', icon: Database, descKey: 'sidebar.data.desc' },
   { id: 'releases', labelKey: 'sidebar.releases', icon: Package, descKey: 'sidebar.releases.desc' },
+  { id: 'bookmarks', labelKey: 'sidebar.bookmarks', icon: Bookmark, descKey: 'sidebar.bookmarks.desc' },
 ];
 
 export default function Sidebar({

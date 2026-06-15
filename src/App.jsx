@@ -12,6 +12,7 @@ import StatsDashboard from './components/StatsDashboard';
 import SprintBoard from './components/SprintBoard';
 import ReleaseLog from './components/ReleaseLog';
 import TagManager from './components/TagManager';
+import BookmarkManager from './components/BookmarkManager';
 import SettingsPanel from './components/SettingsPanel';
 import Modal from './components/Modal';
 import ToastContainer, { toast } from './components/Toast';
@@ -238,6 +239,10 @@ export default function App() {
             <KanbanBoard
               plugins={plugins}
               highlightPluginId={highlightPluginId}
+              bookmarkCollections={store.bookmarkCollections || []}
+              onAddPluginToBookmark={addPluginToBookmark}
+              onRemovePluginFromBookmark={removePluginFromBookmark}
+              onAddBookmarkCollection={addBookmarkCollection}
               onAddPlugin={addPlugin}
               onUpdatePlugin={updatePlugin}
               onDeletePlugin={handleDeletePlugin}
@@ -311,6 +316,18 @@ export default function App() {
             <TagManager
               plugins={plugins} highlightPluginId={highlightPluginId} storeTags={store.tags || []}
               onAddTag={addTag} onRemoveTag={removeTag} t={t}
+            />
+          )}
+          {activeTab === 'bookmarks' && (
+            <BookmarkManager
+              plugins={plugins}
+              bookmarkCollections={store.bookmarkCollections || []}
+              onAddCollection={addBookmarkCollection}
+              onRemoveCollection={removeBookmarkCollection}
+              onRenameCollection={renameBookmarkCollection}
+              onAddPlugin={addPluginToBookmark}
+              onRemovePlugin={removePluginFromBookmark}
+              t={t}
             />
           )}
           {activeTab === 'data' && (
