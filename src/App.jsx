@@ -36,6 +36,8 @@ export default function App() {
     addIdea, updateIdea, deleteIdea, addPluginIdea,
     addRelease, deleteRelease, updateRelease, pinRelease,
     addTag, removeTag,
+    addBookmarkCollection, removeBookmarkCollection, renameBookmarkCollection,
+    addPluginToBookmark, removePluginFromBookmark,
     importStore, resetStore,
     updateSettings,
   } = useStore();
