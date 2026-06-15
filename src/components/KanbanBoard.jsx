@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import {
-  DndContext, DragOverlay, closestCorners, KeyboardSensor,
+  DndContext, DragOverlay, closestCorners, pointerWithin, KeyboardSensor,
   PointerSensor, useSensor, useSensors, useDroppable,
 } from '@dnd-kit/core';
 import {
@@ -223,7 +223,13 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
         <NewPluginDrop onOpen={openNew} onDropFile={handleExternalFileOnNew} t={t} />
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCorners}
+      <DndContext sensors={sensors} collisionDetection={(args) => {
+        // 优先指针命中（标签按钮、卡片）
+        const ptr = pointerWithin(args);
+        if (ptr.length) return ptr;
+        // 降级到最近角落（卡片间空白处排序用）
+        return closestCorners(args);
+      }}
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         {/* 标签栏（本身也是 dnd-kit 落点） */}
         <div className="flex gap-2 mb-4">
