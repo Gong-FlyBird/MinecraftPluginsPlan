@@ -423,9 +423,13 @@
   .tap-target { min-width: 44px; min-height: 44px; }
   .tap-target-nav { min-height: 44px; }
 
-  /* ── 隐藏滚动条（收藏夹行） ── */
+  /* ── 收藏夹行滚动条 ── */
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-thin::-webkit-scrollbar { height: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--border) 40%, transparent); border-radius: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--border) 60%, transparent); }
 
   /* ── 搜索跳转高亮动画 ── */
   @keyframes highlight-pulse {

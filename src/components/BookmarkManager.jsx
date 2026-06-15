@@ -11,10 +11,40 @@ import { calcProgress, timeAgo } from '../utils/helpers';
 function CollectionRow({ collections, activeId, onSelect, onDelete, onAdd }) {
   const rowRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
+  const dragState = useRef(null); // { startX, scrollLeft }
 
   const scroll = (dir) => {
     if (!rowRef.current) return;
     rowRef.current.scrollBy({ left: dir * 200, behavior: 'smooth' });
+  };
+
+  // 鼠标滚轮 → 水平滚动
+  const handleWheel = (e) => {
+    if (!rowRef.current) return;
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      rowRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
+  // 鼠标拖拽滚动
+  const handleMouseDown = (e) => {
+    if (!rowRef.current) return;
+    dragState.current = { startX: e.clientX, scrollLeft: rowRef.current.scrollLeft };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!dragState.current || !rowRef.current) return;
+    const dx = e.clientX - dragState.current.startX;
+    rowRef.current.scrollLeft = dragState.current.scrollLeft - dx;
+  };
+
+  const handleMouseUp = () => {
+    dragState.current = null;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
   };
 
   const items = collections.map(c => (
@@ -64,7 +94,10 @@ function CollectionRow({ collections, activeId, onSelect, onDelete, onAdd }) {
       </div>
       <div className="relative flex items-center">
         <button onClick={() => scroll(-1)} className="flex-shrink-0 glass-btn !p-1 !border-0"><ChevronLeft size={14} /></button>
-        <div ref={rowRef} className="flex gap-2 overflow-x-auto scrollbar-hide mx-2 flex-1">{content}</div>
+        <div ref={rowRef} onWheel={handleWheel} onMouseDown={handleMouseDown}
+          className="flex gap-2 overflow-x-auto mx-2 flex-1 cursor-grab active:cursor-grabbing scrollbar-thin"
+          style={{ scrollbarWidth: 'thin' }}
+        >{content}</div>
         <button onClick={() => scroll(1)} className="flex-shrink-0 glass-btn !p-1 !border-0"><ChevronRight size={14} /></button>
       </div>
     </div>
