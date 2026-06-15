@@ -213,7 +213,7 @@ function BookmarkPluginCard({
           <div>
             <p className="text-[11px] text-hermes-text-muted/50 flex items-center gap-1 cursor-pointer select-none" onClick={() => setBmShow(v => !v)}>
               <Bookmark size={12} className="text-hermes-gold" /> 收藏至
-              <ChevronDown size={11} className={`text-hermes-text-muted/30 transition-transform ${bmShow ? '' : '-rotate-90'}`} />
+              <ChevronDown size={11} className={`text-hermes-text-muted/30 transition-transform ${bmShow ? 'rotate-180' : ''}`} />
             </p>
             {bmShow && (
             <div className="mt-2 space-y-1">
