@@ -148,13 +148,28 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   );
 }
 
-/* ── 网格区域本身也是拖放目标 ── */
-function GridDropZone({ status, children }) {
+/* ── 网格区域本身也是拖放目标（支持 dnd-kit + 外部文件） ── */
+function GridDropZone({ status, onExternalDrop, children }) {
   const { setNodeRef, isOver } = useDroppable({ id: `grid-${status}` });
+  const [extDragOver, setExtDragOver] = useState(false);
+
+  const handleNativeDrop = (e) => {
+    e.preventDefault();
+    setExtDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(f => {
+      const name = f.name.replace(/\.[^.]+$/, '');
+      onExternalDrop?.(name, status);
+    });
+  };
+
   return (
     <div
       ref={setNodeRef}
-      className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03] -m-1 p-1' : ''}`}
+      onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setExtDragOver(true); }}
+      onDragLeave={() => setExtDragOver(false)}
+      onDrop={handleNativeDrop}
+      className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03] -m-1 p-1' : ''} ${extDragOver ? 'ring-2 ring-purple-400/40 bg-purple-400/5' : ''}`}
     >
       {children}
     </div>
@@ -312,7 +327,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
         </div>
 
         {/* 当前状态插件网格（整个区域可拖放） */}
-        <GridDropZone status={activeTab}>
+        <GridDropZone status={activeTab} onExternalDrop={onExternalDrop}>
           {activeCol.items.length === 0 ? (
             <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
               拖拽插件到「{t(`kanban.${activeCol.value}`)}」标签或此区域
