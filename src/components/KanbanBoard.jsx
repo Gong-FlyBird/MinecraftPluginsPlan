@@ -78,7 +78,31 @@ function GridCard({ plugin, onEdit, onDelete, t,
       </div>
       {expanded && (
         <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-3 pt-3 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
-          {/* ── 收藏夹——和查看详情一样的下拉结构 ── */}
+          {/* ── 插件详情 ── */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <StatusBadge status={plugin.status} t={t} />
+            <PriorityBadge priority={plugin.priority} t={t} />
+            <span className="text-xs text-hermes-text-muted/50">MC {plugin.mcVersion}</span>
+          </div>
+          {plugin.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1">{plugin.tags.map((tag, i) => <span key={i} className="tag text-[10px]">{tag}</span>)}</div>
+          )}
+          {plugin.milestones?.length > 0 && (
+            <div>
+              <div className="flex justify-between text-[10px] text-hermes-text-muted/60 mb-0.5">
+                <span>{t('app.progress')}</span><span>{progress}%</span>
+              </div>
+              <div className="progress-bar h-1.5"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
+            </div>
+          )}
+          {plugin.description && <p className="text-xs text-hermes-text-muted/70 break-all">{plugin.description}</p>}
+          <div className="flex items-center gap-1 text-[10px] text-hermes-text-muted/40 pt-1">
+            <Clock size={9} /><span>{timeAgo(plugin.updatedAt, t)}</span>
+          </div>
+
+          <hr className="border-hermes-border/20" />
+
+          {/* ── 收藏到（放底部） ── */}
           <div>
             <p className="text-[11px] text-hermes-text-muted/50 mb-2 flex items-center gap-1">
               <Bookmark size={12} className="text-hermes-gold" /> 收藏到：
@@ -118,30 +142,6 @@ function GridCard({ plugin, onEdit, onDelete, t,
                 <Plus size={12} /> 新建收藏夹
               </button>
             )}
-          </div>
-
-          <hr className="border-hermes-border/20" />
-
-          {/* ── 插件详情 ── */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <StatusBadge status={plugin.status} t={t} />
-            <PriorityBadge priority={plugin.priority} t={t} />
-            <span className="text-xs text-hermes-text-muted/50">MC {plugin.mcVersion}</span>
-          </div>
-          {plugin.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-1">{plugin.tags.map((tag, i) => <span key={i} className="tag text-[10px]">{tag}</span>)}</div>
-          )}
-          {plugin.milestones?.length > 0 && (
-            <div>
-              <div className="flex justify-between text-[10px] text-hermes-text-muted/60 mb-0.5">
-                <span>{t('app.progress')}</span><span>{progress}%</span>
-              </div>
-              <div className="progress-bar h-1.5"><div className="progress-bar-fill" style={{ width: `${progress}%` }} /></div>
-            </div>
-          )}
-          {plugin.description && <p className="text-xs text-hermes-text-muted/70 break-all">{plugin.description}</p>}
-          <div className="flex items-center gap-1 text-[10px] text-hermes-text-muted/40 pt-1">
-            <Clock size={9} /><span>{timeAgo(plugin.updatedAt, t)}</span>
           </div>
         </div>
       )}
