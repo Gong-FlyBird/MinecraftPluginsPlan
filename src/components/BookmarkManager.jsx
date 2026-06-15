@@ -310,7 +310,7 @@ export default function BookmarkManager({
             <span className="text-xs text-hermes-text-muted/40 font-normal">
               ({activeCol?.pluginIds?.length || 0})
             </span>
-            {activeCol && activeCol.id !== 'default' && (
+            {activeCol && (
               <button onClick={() => { onRemoveCollection(activeCol.id); setActiveColId('default'); }}
                 className="text-red-400/50 hover:text-red-400 transition-colors ml-1" title="删除收藏夹">
                 <Trash2 size={13} />

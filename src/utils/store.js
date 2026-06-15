@@ -305,7 +305,6 @@ export function useStore() {
   };
 
   const removeBookmarkCollection = (id) => {
-    if (id === 'default') return;
     setStore(prev => ({
       ...prev,
       bookmarkCollections: prev.bookmarkCollections.filter(c => c.id !== id),
