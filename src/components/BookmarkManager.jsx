@@ -95,8 +95,8 @@ function CollectionRow({ collections, activeId, onSelect, onDelete, onAdd }) {
       <div className="relative flex items-center">
         <button onClick={() => scroll(-1)} className="flex-shrink-0 glass-btn !p-1 !border-0"><ChevronLeft size={14} /></button>
         <div ref={rowRef} onWheel={handleWheel} onMouseDown={handleMouseDown}
-          className="flex gap-2 overflow-x-auto mx-2 flex-1 cursor-grab active:cursor-grabbing scrollbar-thin"
-          style={{ scrollbarWidth: 'thin' }}
+          className="flex gap-2 overflow-x-auto mx-2 flex-1 cursor-grab active:cursor-grabbing scrollbar-hide"
+          style={{ scrollbarWidth: 'none' }}
         >{content}</div>
         <button onClick={() => scroll(1)} className="flex-shrink-0 glass-btn !p-1 !border-0"><ChevronRight size={14} /></button>
       </div>
