@@ -155,7 +155,6 @@ function GridDropZone({ status, onExternalDrop, children }) {
 /* ── 拖拽中可见的大面积落点指示条 ── */
 function DropStrip({ status, onMoveTo, visible }) {
   const { setNodeRef, isOver } = useDroppable({ id: `strip-${status}` });
-  if (!visible) return null;
   const colors = {
     planning: { text: 'text-blue-400', bg: 'bg-blue-400/5', border: 'border-blue-400/30' },
     developing: { text: 'text-amber-400', bg: 'bg-amber-400/5', border: 'border-amber-400/30' },
@@ -314,9 +313,16 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ))}
         </div>
 
+        {/* 三个大面积落点条（始终渲染，拖拽时显示） */}
+        <div className={`flex gap-2 mb-3 min-h-[70px] transition-all ${dragging ? 'opacity-100' : 'opacity-0 pointer-events-none absolute -z-10'}`}>
+          {STATUSES.map(s => (
+            <DropStrip key={s.value} status={s.value} />
+          ))}
+        </div>
+
         {/* 网格区 */}
         <GridDropZone status={activeTab} onExternalDrop={onExternalDrop}>
-          <div className="pt-1">
+          <div className={dragging ? 'pt-0' : 'pt-1'}>
             {activeCol.items.length === 0 ? (
               <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
                 拖拽插件到此处
@@ -334,15 +340,6 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
             )}
           </div>
         </GridDropZone>
-
-        {/* 拖拽中：三个大面积落点条（放在卡片下方） */}
-        {dragging && (
-          <div className="flex gap-2 mt-3 min-h-[80px]">
-            {STATUSES.map(s => (
-              <DropStrip key={s.value} status={s.value} visible={true} />
-            ))}
-          </div>
-        )}
 
         <DragOverlay>
           {activePlugin ? (
