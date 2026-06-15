@@ -77,7 +77,7 @@ function GridCard({ plugin, onEdit, onDelete, t,
         <ChevronDown size={11} className={`text-hermes-text-muted/20 flex-shrink-0 transition-transform ${expanded ? '' : 'rotate-180'}`} />
       </div>
       {expanded && (
-        <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-3 pt-3" onClick={e => e.stopPropagation()}>
+        <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-3 pt-3 max-h-64 overflow-y-auto" onClick={e => e.stopPropagation()}>
           {/* ── 收藏夹——和查看详情一样的下拉结构 ── */}
           <div>
             <p className="text-[11px] text-hermes-text-muted/50 mb-2 flex items-center gap-1">
