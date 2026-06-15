@@ -41,7 +41,7 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
           className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Edit3 size={11} /></button>
         <button onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
           className="glass-btn-danger !p-1 !border-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Trash2 size={11} /></button>
-        <ChevronDown size={11} className={`text-hermes-text-muted/20 flex-shrink-0 transition-transform ${expanded ? '' : '-rotate-90'}`} />
+        <ChevronDown size={11} className={`text-hermes-text-muted/20 flex-shrink-0 transition-transform ${expanded ? '' : 'rotate-180'}`} />
       </div>
       {expanded && (
         <div className="px-3 pb-3 border-t border-hermes-border/20 slide-up space-y-2 pt-2">
