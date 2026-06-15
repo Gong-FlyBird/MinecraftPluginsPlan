@@ -283,6 +283,8 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     onMoveTo?.(active.id, toStatus, overIdx >= 0 ? overIdx : 999);
   }, [columns, plugins, onMoveTo, onReorder]);
 
+  const [pageDragOver, setPageDragOver] = useState(false);
+
   const openNew = () => { setEditingPlugin(null); setFormOpen(true); };
   const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
   const handleDeleteClick = (id) => { setConfirmDelete(plugins.find(p => p.id === id)); };
@@ -300,6 +302,28 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     setFormOpen(true);
   };
 
+  const handlePageDragOver = (e) => {
+    // 只响应外部文件拖入（不是 dnd-kit 卡片拖拽）
+    if (e.dataTransfer.types?.includes('Files')) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      setPageDragOver(true);
+    }
+  };
+  const handlePageDragLeave = (e) => {
+    // 只在真正离开页面时关闭
+    if (!e.currentTarget.contains(e.relatedTarget)) setPageDragOver(false);
+  };
+  const handlePageDrop = (e) => {
+    e.preventDefault();
+    setPageDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(f => {
+      const name = f.name.replace(/\.[^.]+$/, '');
+      onExternalDrop?.(name, activeTab);
+    });
+  };
+
   return (
     <div className="fade-in">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
@@ -309,6 +333,26 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
         </div>
         <NewPluginDrop onOpen={openNew} onDropFile={handleExternalFileOnNew} t={t} />
       </div>
+
+      {/* 全屏外部位拖放区 */}
+      <div
+        onDragOver={handlePageDragOver}
+        onDragLeave={handlePageDragLeave}
+        onDrop={handlePageDrop}
+        className="relative"
+      >
+        {/* 全屏拖入浮层 */}
+        {pageDragOver && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 bg-hermes-gold/5 backdrop-blur-sm" />
+            <div className="relative glass-card px-10 py-8 text-center shadow-gold ring-2 ring-hermes-gold/50 scale-110">
+              <span className="text-xl font-bold text-hermes-gold">松手放入插件</span>
+              <p className="text-sm text-hermes-text-muted/60 mt-2">
+                将自动添加到「{t(`kanban.${activeTab}`)}」
+              </p>
+            </div>
+          </div>
+        )}
 
       <DndContext sensors={sensors} collisionDetection={closestCorners}
         onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -366,6 +410,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ) : null}
         </DragOverlay>
       </DndContext>
+      </div>
 
       <PluginForm open={formOpen} onClose={handleClose} onSave={handleSave} plugin={editingPlugin} t={t} />
 
