@@ -212,6 +212,21 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
 
   const handleDragStart = useCallback(({ active }) => setActiveId(active.id), []);
 
+  /** 拖拽中自动切换标签：拖到其他标签区域时自动切换显示 */
+  const handleDragOver = useCallback(({ active, over }) => {
+    if (!over || !active) return;
+    // 不切换同列内的排序
+    const fromCol = columns.find(c => c.items.some(p => p.id === active.id));
+    if (!fromCol) return;
+    // 确定悬浮在哪个状态上
+    const overStatus = typeof over.id === 'string' && over.id.startsWith('grid-')
+      ? over.id.replace('grid-', '')
+      : columns.find(c => c.value === over.id || c.items.some(p => p.id === over.id))?.value;
+    if (overStatus && overStatus !== activeTab) {
+      setActiveTab(overStatus);
+    }
+  }, [columns, activeTab]);
+
   const handleDragEnd = useCallback(({ active, over }) => {
     setActiveId(null);
     if (!over) return;
@@ -271,7 +286,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCorners}
-        onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
         {/* 标签栏 */}
         <div className="flex gap-2 mb-4">
           {columns.map(col => (
@@ -284,9 +299,10 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
           ))}
         </div>
 
-        {/* 网格区 */}
+        {/* 网格区（占满标签以下所有区域） */}
         <GridDropZone status={activeTab} onExternalDrop={onExternalDrop}>
-          {activeCol.items.length === 0 ? (
+          <div className="pt-1">
+            {activeCol.items.length === 0 ? (
             <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
               拖拽插件到此处
             </div>
@@ -301,6 +317,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
               </div>
             </SortableContext>
           )}
+          </div>
         </GridDropZone>
 
         <DragOverlay>
