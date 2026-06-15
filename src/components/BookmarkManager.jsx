@@ -4,7 +4,7 @@ import GlassPanel from './GlassPanel';
 import { StatusBadge } from './StatusBadge';
 import { calcProgress } from '../utils/helpers';
 
-/* ── 收藏夹行（左右滚动可展开） ── */
+/* ── 收藏夹行 ── */
 function CollectionRow({ collections, activeId, onSelect, onRename, onDelete, onAdd }) {
   const rowRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
@@ -14,6 +14,30 @@ function CollectionRow({ collections, activeId, onSelect, onRename, onDelete, on
     rowRef.current.scrollBy({ left: dir * 200, behavior: 'smooth' });
   };
 
+  const items = (expanded ? null : null); // unused
+  const content = (
+    <>
+      {collections.map(c => (
+        <button key={c.id}
+          onClick={() => onSelect(c.id)}
+          className={`flex-shrink-0 glass px-3 py-2 rounded-sm text-xs transition-all cursor-pointer text-left ${
+            activeId === c.id ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/8' : 'hover:bg-hermes-gold/[0.04]'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="font-medium whitespace-nowrap">{c.name}</span>
+            <span className="text-[10px] text-hermes-text-muted/40">{c.pluginIds.length}</span>
+            {c.id !== 'default' && (
+              <button onClick={e => { e.stopPropagation(); onDelete(c.id); }}
+                className="text-red-400/40 hover:text-red-400"><Trash2 size={10} /></button>
+            )}
+          </div>
+        </button>
+      ))}
+      <AddCollectionCard onAdd={onAdd} />
+    </>
+  );
+
   if (expanded) {
     return (
       <div className="glass p-3 mb-3">
@@ -21,13 +45,7 @@ function CollectionRow({ collections, activeId, onSelect, onRename, onDelete, on
           <h4 className="text-xs font-semibold text-hermes-text-muted/60 uppercase tracking-wider">收藏夹</h4>
           <button onClick={() => setExpanded(false)} className="glass-btn !p-1 !border-0 text-xs">收起</button>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {collections.map(c => (
-            <CollectionCard key={c.id} collection={c} active={activeId === c.id}
-              onSelect={() => onSelect(c.id)} onRename={onRename} onDelete={onDelete} />
-          ))}
-          <AddCollectionCard onAdd={onAdd} />
-        </div>
+        <div className="flex flex-wrap gap-2">{content}</div>
       </div>
     );
   }
@@ -38,55 +56,12 @@ function CollectionRow({ collections, activeId, onSelect, onRename, onDelete, on
         <h4 className="text-xs font-semibold text-hermes-text-muted/60 uppercase tracking-wider">收藏夹</h4>
         <button onClick={() => setExpanded(true)} className="text-[11px] text-hermes-gold hover:text-hermes-gold/80">展开全部</button>
       </div>
-      <div className="relative">
-        <button onClick={() => scroll(-1)} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-btn !p-1 !border-0">
-          <ChevronLeft size={14} />
-        </button>
-        <div ref={rowRef} className="flex gap-2 overflow-x-auto scrollbar-hide px-6 py-1">
-          {collections.map(c => (
-            <CollectionCard key={c.id} collection={c} active={activeId === c.id}
-              onSelect={() => onSelect(c.id)} onRename={onRename} onDelete={onDelete} />
-          ))}
-          <AddCollectionCard onAdd={onAdd} />
-        </div>
-        <button onClick={() => scroll(1)} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-btn !p-1 !border-0">
-          <ChevronRight size={14} />
-        </button>
+      <div className="relative flex items-center">
+        <button onClick={() => scroll(-1)} className="flex-shrink-0 glass-btn !p-1 !border-0"><ChevronLeft size={14} /></button>
+        <div ref={rowRef} className="flex gap-2 overflow-x-auto scrollbar-hide mx-2 flex-1">{content}</div>
+        <button onClick={() => scroll(1)} className="flex-shrink-0 glass-btn !p-1 !border-0"><ChevronRight size={14} /></button>
       </div>
     </div>
-  );
-}
-
-function CollectionCard({ collection, active, onSelect, onRename, onDelete }) {
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(collection.name);
-  return (
-    <button
-      onClick={onSelect}
-      className={`flex-shrink-0 glass px-3 py-2 rounded-sm text-xs transition-all cursor-pointer text-left ${
-        active ? 'ring-2 ring-hermes-gold/40 bg-hermes-gold/8' : 'hover:bg-hermes-gold/[0.04]'
-      }`}
-    >
-      {editing ? (
-        <input autoFocus value={name} onChange={e => setName(e.target.value)}
-          onBlur={() => { onRename(collection.id, name); setEditing(false); }}
-          onKeyDown={e => e.key === 'Enter' && (onRename(collection.id, name), setEditing(false))}
-          className="glass-input !py-0 !px-1 text-xs w-24" />
-      ) : (
-        <div className="flex items-center gap-2">
-          <span className="font-medium whitespace-nowrap">{collection.name}</span>
-          <span className="text-[10px] text-hermes-text-muted/40">{collection.pluginIds.length}</span>
-          <button onClick={e => { e.stopPropagation(); setEditing(true); }} className="text-hermes-text-muted/30 hover:text-hermes-text-muted/60">
-            <Edit3 size={10} />
-          </button>
-          {collection.id !== 'default' && (
-            <button onClick={e => { e.stopPropagation(); onDelete(collection.id); }} className="text-red-400/40 hover:text-red-400">
-              <Trash2 size={10} />
-            </button>
-          )}
-        </div>
-      )}
-    </button>
   );
 }
 
@@ -96,7 +71,7 @@ function AddCollectionCard({ onAdd }) {
   if (!creating) {
     return (
       <button onClick={() => setCreating(true)}
-        className="flex-shrink-0 glass px-3 py-2 rounded-sm text-xs flex items-center gap-1 text-hermes-text-muted/50 hover:text-hermes-text-muted/70 cursor-pointer whitespace-nowrap">
+        className="flex-shrink-0 glass px-3 py-2 rounded-sm text-xs flex items-center gap-1 text-hermes-text-muted/50 hover:text-hermes-text-muted/70 whitespace-nowrap">
         <Plus size={12} /> 新建收藏夹
       </button>
     );
@@ -146,22 +121,18 @@ function BookmarkPluginCard({ plugin, onRemove, collectionId, t }) {
 
 /* ── 主页面 ── */
 export default function BookmarkManager({
-  plugins, bookmarkCollections, highlightPluginId,
+  plugins = [], bookmarkCollections = [], highlightPluginId,
   onAddCollection, onRemoveCollection, onRenameCollection,
   onAddPlugin, onRemovePlugin, t,
 }) {
   const [activeColId, setActiveColId] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // 选中第一个有内容的收藏夹
-  useEffect(() => {
-    if (!bookmarkCollections.find(c => c.id === activeColId)) {
-      setActiveColId(bookmarkCollections[0]?.id || 'default');
-    }
-  }, [bookmarkCollections]);
-
-  const activeCol = bookmarkCollections.find(c => c.id === activeColId) || bookmarkCollections[0];
+  // 当前活动收藏夹
+  const activeCol = bookmarkCollections.find(c => c.id === activeColId) || bookmarkCollections[0] || null;
   const activePluginIds = activeCol?.pluginIds || [];
+
+  // 过滤收藏夹内插件
   const activePlugins = useMemo(() => {
     let list = plugins.filter(p => activePluginIds.includes(p.id));
     if (searchQuery.trim()) {
@@ -175,17 +146,15 @@ export default function BookmarkManager({
     <div className="fade-in">
       {/* 1. 标题+描述 */}
       <div className="mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('sidebar.bookmarks')}</h1>
-        <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">{t('sidebar.bookmarks.desc')}</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">收藏</h1>
+        <p className="text-xs sm:text-sm text-hermes-text-muted/60 mt-1">管理你收藏的插件</p>
       </div>
 
       {/* 2. 搜索 */}
       <div className="relative mb-4">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-hermes-text-muted/30" />
-        <input
-          type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-          className="glass-input pl-9 text-sm w-full max-w-md" placeholder="搜索收藏的插件…"
-        />
+        <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+          className="glass-input pl-9 text-sm w-full max-w-md" placeholder="搜索收藏的插件…" />
         {searchQuery && (
           <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 glass-btn !p-0.5 !border-0">
             <X size={13} className="text-hermes-text-muted/40" />
@@ -194,42 +163,32 @@ export default function BookmarkManager({
       </div>
 
       {/* 3. 收藏夹行 */}
-      <CollectionRow
-        collections={bookmarkCollections}
-        activeId={activeCol?.id}
-        onSelect={setActiveColId}
+      <CollectionRow collections={bookmarkCollections} activeId={activeCol?.id}
+        onSelect={id => setActiveColId(id)}
         onRename={onRenameCollection}
         onDelete={(id) => { onRemoveCollection(id); if (activeColId === id) setActiveColId('default'); }}
-        onAdd={onAddCollection}
-      />
+        onAdd={onAddCollection} />
 
       {/* 4. 收藏夹内容 */}
-      {activeCol && (
-        <GlassPanel className="!p-3 sm:!p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-hermes-text flex items-center gap-2">
-              <Bookmark size={14} className="text-hermes-gold" />
-              {activeCol.name}
-              <span className="text-xs text-hermes-text-muted/40 font-normal">({activeCol.pluginIds.length})</span>
-            </h3>
-          </div>
+      <GlassPanel className="!p-3 sm:!p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Bookmark size={14} className="text-hermes-gold" />
+          <h3 className="text-sm font-semibold text-hermes-text">{activeCol?.name || '收藏夹'}</h3>
+          <span className="text-xs text-hermes-text-muted/40">({activeCol?.pluginIds?.length || 0})</span>
+        </div>
 
-          {activePlugins.length === 0 ? (
-            <div className="text-center py-10 text-sm text-hermes-text-muted/30">
-              {searchQuery ? '未找到匹配插件' : '收藏夹为空，在看板中点击卡片上的收藏按钮添加插件'}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {activePlugins.map(p => (
-                <BookmarkPluginCard key={p.id} plugin={p}
-                  onRemove={onRemovePlugin}
-                  collectionId={activeCol.id}
-                  t={t} />
-              ))}
-            </div>
-          )}
-        </GlassPanel>
-      )}
+        {activePlugins.length === 0 ? (
+          <div className="text-center py-10 text-sm text-hermes-text-muted/30">
+            {searchQuery ? '未找到匹配插件' : '收藏夹为空，在看板中点击卡片上的收藏按钮添加插件'}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {activePlugins.map(p => (
+              <BookmarkPluginCard key={p.id} plugin={p} collectionId={activeCol?.id} onRemove={onRemovePlugin} t={t} />
+            ))}
+          </div>
+        )}
+      </GlassPanel>
     </div>
   );
 }
