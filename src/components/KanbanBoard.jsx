@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import {
   DndContext, DragOverlay, closestCorners, KeyboardSensor,
   PointerSensor, useSensor, useSensors, useDroppable,
@@ -283,13 +283,18 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     onMoveTo?.(active.id, toStatus, overIdx >= 0 ? overIdx : 999);
   }, [columns, plugins, onMoveTo, onReorder]);
 
-  const [pageDragOver, setPageDragOver] = useState(false);
+  const pageDragRef = useRef(0);
+  const dragOverlayRef = useRef(null);
 
   const openNew = () => { setEditingPlugin(null); setFormOpen(true); };
   const handleEdit = (plugin) => { setEditingPlugin(plugin); setFormOpen(true); };
   const handleDeleteClick = (id) => { setConfirmDelete(plugins.find(p => p.id === id)); };
   const handleSave = (data) => {
     if (!editingPlugin || !editingPlugin.id) {
+      if (plugins.some(p => p.name === data.name)) {
+        toast('warning', `插件「${data.name}」已存在`);
+        return;
+      }
       onAddPlugin(data);
     } else {
       onUpdatePlugin(editingPlugin.id, data);
@@ -302,21 +307,26 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
     setFormOpen(true);
   };
 
+  const showDragOverlay = () => {
+    if (dragOverlayRef.current) dragOverlayRef.current.style.display = 'flex';
+  };
+  const hideDragOverlay = () => {
+    if (dragOverlayRef.current) dragOverlayRef.current.style.display = 'none';
+  };
   const handlePageDragOver = (e) => {
-    // 只响应外部文件拖入
     const types = e.dataTransfer.types;
     if (types && Array.from(types).includes('Files')) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
-      setPageDragOver(true);
+      showDragOverlay();
     }
   };
   const handlePageDragLeave = (e) => {
-    setPageDragOver(false);
+    hideDragOverlay();
   };
   const handlePageDrop = (e) => {
     e.preventDefault();
-    setPageDragOver(false);
+    hideDragOverlay();
     const files = Array.from(e.dataTransfer.files);
     files.forEach(f => {
       const name = f.name.replace(/\.[^.]+$/, '');
@@ -332,8 +342,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
       className="fade-in relative"
     >
       {/* 全屏拖入浮层 */}
-      {pageDragOver && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none">
+      <div ref={dragOverlayRef} className="fixed inset-0 z-[999] items-center justify-center pointer-events-none" style={{ display: 'none' }}>
           <div className="absolute inset-0 bg-hermes-gold/5 backdrop-blur-sm" />
           <div className="relative glass-card px-10 py-8 text-center shadow-gold ring-2 ring-hermes-gold/50 scale-110">
             <span className="text-xl font-bold text-hermes-gold">松手放入插件</span>
@@ -342,7 +351,6 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
             </p>
           </div>
         </div>
-      )}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-hermes-text">{t('kanban.title')}</h1>
