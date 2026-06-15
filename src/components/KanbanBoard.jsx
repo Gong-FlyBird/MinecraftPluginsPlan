@@ -100,12 +100,38 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   );
 }
 
-/* ── 网格落点区（标签内空白也可拖入） ── */
-function GridDrop({ status, children }) {
+/* ── 网格落点区（dnd-kit + 外部文件拖入） ── */
+function GridDrop({ status, onExternalDrop, children }) {
   const { setNodeRef, isOver } = useDroppable({ id: `grid-${status}` });
+  const [extDragOver, setExtDragOver] = useState(false);
+
   return (
-    <div ref={setNodeRef} className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03]' : ''}`}>
-      {children}
+    <div
+      ref={setNodeRef}
+      onDragOver={e => {
+        if (e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files')) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+          setExtDragOver(true);
+        }
+      }}
+      onDragLeave={() => setExtDragOver(false)}
+      onDrop={e => {
+        e.preventDefault();
+        e.stopPropagation();
+        setExtDragOver(false);
+        Array.from(e.dataTransfer.files).forEach(f =>
+          onExternalDrop?.(f.name.replace(/\.[^.]+$/, ''), status)
+        );
+      }}
+      className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03]' : ''} ${extDragOver ? 'ring-2 ring-hermes-gold/50 bg-hermes-gold/10' : ''}`}
+    >
+      {extDragOver && (
+        <div className="flex items-center justify-center py-8 text-sm font-semibold text-hermes-gold">
+          松手放入插件
+        </div>
+      )}
+      {!extDragOver && children}
     </div>
   );
 }
@@ -248,7 +274,7 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
         </div>
 
         {/* 网格（整块区域可拖放） */}
-        <GridDrop status={activeTab}>
+        <GridDrop status={activeTab} onExternalDrop={onExternalDrop}>
           {activeCol.items.length === 0 ? (
             <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
               拖拽插件到此处
