@@ -130,6 +130,7 @@ function BookmarkPluginCard({
   const [expanded, setExpanded] = useState(false);
   const [bmCreating, setBmCreating] = useState(false);
   const [bmNewName, setBmNewName] = useState('');
+  const [bmShow, setBmShow] = useState(true);
   const progress = calcProgress(plugin.milestones);
 
   const inBookmarks = bookmarkCollections
@@ -208,12 +209,14 @@ function BookmarkPluginCard({
 
           <hr className="border-hermes-border/20" />
 
-          {/* 收藏到（放底部） */}
+          {/* 收藏至（放底部） */}
           <div>
-            <p className="text-[11px] text-hermes-text-muted/50 mb-2 flex items-center gap-1">
-              <Bookmark size={12} className="text-hermes-gold" /> 收藏到：
+            <p className="text-[11px] text-hermes-text-muted/50 flex items-center gap-1 cursor-pointer select-none" onClick={() => setBmShow(v => !v)}>
+              <Bookmark size={12} className="text-hermes-gold" /> 收藏至
+              <ChevronDown size={11} className={`text-hermes-text-muted/30 transition-transform ${bmShow ? '' : '-rotate-90'}`} />
             </p>
-            <div className="space-y-1">
+            {bmShow && (
+            <div className="mt-2 space-y-1">
               {bookmarkCollections.map(c => {
                 const checked = inBookmarks.includes(c.id);
                 return (
@@ -232,21 +235,22 @@ function BookmarkPluginCard({
                   </label>
                 );
               })}
+              {bmCreating ? (
+                <div className="flex gap-1 mt-2">
+                  <input autoFocus value={bmNewName}
+                    onChange={e => setBmNewName(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleBmCreate(); if (e.key === 'Escape') { setBmCreating(false); setBmNewName(''); } }}
+                    className="glass-input !py-1 !px-2 text-xs flex-1" placeholder="收藏夹名称" />
+                  <button onClick={handleBmCreate} className="glass-btn !py-1 !px-2 text-xs">创建</button>
+                  <button onClick={() => { setBmCreating(false); setBmNewName(''); }} className="glass-btn !py-1 !px-2 text-xs">取消</button>
+                </div>
+              ) : (
+                <button onClick={() => setBmCreating(true)}
+                  className="text-xs text-hermes-gold hover:text-hermes-gold/80 mt-1 flex items-center gap-1">
+                  <Plus size={12} /> 新建收藏夹
+                </button>
+              )}
             </div>
-            {bmCreating ? (
-              <div className="flex gap-1 mt-2">
-                <input autoFocus value={bmNewName}
-                  onChange={e => setBmNewName(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleBmCreate(); if (e.key === 'Escape') { setBmCreating(false); setBmNewName(''); } }}
-                  className="glass-input !py-1 !px-2 text-xs flex-1" placeholder="收藏夹名称" />
-                <button onClick={handleBmCreate} className="glass-btn !py-1 !px-2 text-xs">创建</button>
-                <button onClick={() => { setBmCreating(false); setBmNewName(''); }} className="glass-btn !py-1 !px-2 text-xs">取消</button>
-              </div>
-            ) : (
-              <button onClick={() => setBmCreating(true)}
-                className="text-xs text-hermes-gold hover:text-hermes-gold/80 mt-1 flex items-center gap-1">
-                <Plus size={12} /> 新建收藏夹
-              </button>
             )}
           </div>
         </div>
