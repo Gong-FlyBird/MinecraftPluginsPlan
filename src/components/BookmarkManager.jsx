@@ -57,10 +57,6 @@ function CollectionRow({ collections, activeId, onSelect, onDelete, onAdd }) {
       <div className="flex items-center gap-2">
         <span className="font-medium whitespace-nowrap">{c.name}</span>
         <span className="text-[10px] text-hermes-text-muted/40">{c.pluginIds.length}</span>
-        {c.id !== 'default' && (
-          <span onClick={e => { e.stopPropagation(); onDelete(c.id); }}
-            className="text-red-400/40 hover:text-red-400 cursor-pointer"><Trash2 size={10} /></span>
-        )}
       </div>
     </button>
   ));
@@ -309,11 +305,17 @@ export default function BookmarkManager({
       <GlassPanel className="!p-3 sm:!p-4">
         <div className="flex items-center gap-2 mb-3">
           <Bookmark size={14} className="text-hermes-gold flex-shrink-0" />
-          <h3 className="text-sm font-semibold text-hermes-text">
+          <h3 className="text-sm font-semibold text-hermes-text flex items-center gap-2">
             {activeCol?.name || '收藏夹'}
-            <span className="ml-2 text-xs text-hermes-text-muted/40 font-normal">
+            <span className="text-xs text-hermes-text-muted/40 font-normal">
               ({activeCol?.pluginIds?.length || 0})
             </span>
+            {activeCol && activeCol.id !== 'default' && (
+              <button onClick={() => { onRemoveCollection(activeCol.id); setActiveColId('default'); }}
+                className="text-red-400/50 hover:text-red-400 transition-colors ml-1" title="删除收藏夹">
+                <Trash2 size={13} />
+              </button>
+            )}
           </h3>
         </div>
 
