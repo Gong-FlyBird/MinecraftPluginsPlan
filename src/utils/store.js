@@ -26,8 +26,9 @@ export function useStore() {
 
   /* ──────── Plugin CRUD ──────── */
 
+  let _toastOnce = (msg) => { toast('success', msg); _toastOnce = () => {}; };
   const addPlugin = (plugin) => {
-    toast('success', '插件已创建');
+    _toastOnce('插件已创建');
     setStore(prev => ({
       ...prev,
       plugins: [...prev.plugins, {
