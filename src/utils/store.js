@@ -28,17 +28,24 @@ export function useStore() {
 
   let _toastOnce = (msg) => { toast('success', msg); _toastOnce = () => {}; };
   const addPlugin = (plugin) => {
-    _toastOnce('插件已创建');
-    setStore(prev => ({
-      ...prev,
-      plugins: [...prev.plugins, {
-        ...plugin,
-        id: uid(),
-        timeline: [{ action: 'created', detailKey: 'timeline.created', timestamp: Date.now() }],
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      }],
-    }));
+    setStore(prev => {
+      // 防重复：同名检查
+      if (prev.plugins.some(p => p.name === plugin.name)) {
+        toast('warning', `插件「${plugin.name}」已存在`);
+        return prev;
+      }
+      _toastOnce('插件已创建');
+      return {
+        ...prev,
+        plugins: [...prev.plugins, {
+          ...plugin,
+          id: uid(),
+          timeline: [{ action: 'created', detailKey: 'timeline.created', timestamp: Date.now() }],
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        }],
+      };
+    });
   };
 
   const updatePlugin = (id, patch) => setStore(prev => ({
