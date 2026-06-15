@@ -9,6 +9,7 @@ import IdeaVault from './components/IdeaVault';
 import TimelineView from './components/TimelineView';
 import DataManager from './components/DataManager';
 import StatsDashboard from './components/StatsDashboard';
+import BookmarkManager from './components/BookmarkManager';
 import SprintBoard from './components/SprintBoard';
 import ReleaseLog from './components/ReleaseLog';
 import TagManager from './components/TagManager';
@@ -311,6 +312,19 @@ export default function App() {
             <TagManager
               plugins={plugins} highlightPluginId={highlightPluginId} storeTags={store.tags || []}
               onAddTag={addTag} onRemoveTag={removeTag} t={t}
+            />
+          )}
+          {activeTab === 'bookmarks' && (
+            <BookmarkManager
+              plugins={plugins}
+              bookmarkCollections={store.bookmarkCollections || []}
+              highlightPluginId={highlightPluginId}
+              onAddCollection={addBookmarkCollection}
+              onRemoveCollection={removeBookmarkCollection}
+              onRenameCollection={renameBookmarkCollection}
+              onAddPlugin={addPluginToBookmark}
+              onRemovePlugin={removePluginFromBookmark}
+              t={t}
             />
           )}
           {activeTab === 'data' && (

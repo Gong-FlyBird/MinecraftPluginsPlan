@@ -423,6 +423,10 @@
   .tap-target { min-width: 44px; min-height: 44px; }
   .tap-target-nav { min-height: 44px; }
 
+  /* ── 隐藏滚动条（收藏夹行） ── */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
   /* ── 搜索跳转高亮动画 ── */
   @keyframes highlight-pulse {
     0%   { box-shadow: 0 0 0 0 rgba(212,175,55,0.5); transform: scale(1); }

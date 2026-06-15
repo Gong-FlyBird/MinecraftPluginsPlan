@@ -8,6 +8,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { Plus, Edit3, Trash2, ChevronDown, Clock } from 'lucide-react';
+import BookmarkButton from './BookmarkButton';
 import PluginForm from './PluginForm';
 import Modal from './Modal';
 import EmptyState from './EmptyState';
@@ -37,6 +38,7 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
         }`} />
         <span className="flex-1 text-sm font-semibold text-hermes-text truncate min-w-0">{plugin.name}</span>
         <span className="text-[10px] text-hermes-text-muted/40 flex-shrink-0 whitespace-nowrap">v{plugin.version}</span>
+        <BookmarkButton pluginId={plugin.id} t={t} />
         <button onClick={e => { e.stopPropagation(); onEdit(plugin); }}
           className="glass-btn !p-1 !border-0 hover:!bg-hermes-gold/8 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"><Edit3 size={11} /></button>
         <button onClick={e => { e.stopPropagation(); onDelete(plugin.id); }}
