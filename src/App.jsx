@@ -239,6 +239,10 @@ export default function App() {
             <KanbanBoard
               plugins={plugins}
               highlightPluginId={highlightPluginId}
+              bookmarkCollections={store.bookmarkCollections || []}
+              onAddPluginToBookmark={addPluginToBookmark}
+              onRemovePluginFromBookmark={removePluginFromBookmark}
+              onAddBookmarkCollection={addBookmarkCollection}
               onAddPlugin={addPlugin}
               onUpdatePlugin={updatePlugin}
               onDeletePlugin={handleDeletePlugin}

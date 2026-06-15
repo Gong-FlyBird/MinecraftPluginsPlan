@@ -1,20 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bookmark, BookmarkCheck, Plus, X } from 'lucide-react';
-import { useStore } from '../utils/store';
 
 /**
  * 插件卡片上的收藏按钮 — 点击弹出收藏夹选择
  */
-export default function BookmarkButton({ pluginId, t }) {
-  const { store, addPluginToBookmark, removePluginFromBookmark, addBookmarkCollection } = useStore();
-  const collections = store.bookmarkCollections || [];
+export default function BookmarkButton({
+  pluginId, t,
+  bookmarkCollections = [],
+  onAddPluginToBookmark, onRemovePluginFromBookmark, onAddBookmarkCollection,
+}) {
   const [open, setOpen] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const menuRef = useRef(null);
 
   // 该插件已收藏到的收藏夹 id 集合
-  const inBookmarks = collections.filter(c => c.pluginIds.includes(pluginId)).map(c => c.id);
+  const inBookmarks = bookmarkCollections.filter(c => c.pluginIds.includes(pluginId)).map(c => c.id);
 
   // 点击外部关闭
   useEffect(() => {
@@ -28,15 +29,15 @@ export default function BookmarkButton({ pluginId, t }) {
 
   const toggle = (collectionId) => {
     if (inBookmarks.includes(collectionId)) {
-      removePluginFromBookmark(pluginId, collectionId);
+      onRemovePluginFromBookmark(pluginId, collectionId);
     } else {
-      addPluginToBookmark(pluginId, collectionId);
+      onAddPluginToBookmark(pluginId, collectionId);
     }
   };
 
   const handleCreate = () => {
     if (!newName.trim()) return;
-    addBookmarkCollection(newName.trim());
+    onAddBookmarkCollection(newName.trim());
     setNewName('');
     setCreating(false);
   };
@@ -66,7 +67,7 @@ export default function BookmarkButton({ pluginId, t }) {
           </div>
 
           <div className="max-h-48 overflow-y-auto py-1">
-            {collections.map(c => (
+            {bookmarkCollections.map(c => (
               <button
                 key={c.id}
                 onClick={() => toggle(c.id)}

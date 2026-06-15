@@ -1,13 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import {
-  Bookmark, BookmarkCheck, Plus, X, Search, ChevronLeft, ChevronRight,
-  Layout, Milestone, Target, Hash, Rocket, Trash2, Edit3,
-} from 'lucide-react';
+import { Bookmark, Plus, X, Search, ChevronLeft, ChevronRight, Trash2, Edit3 } from 'lucide-react';
 import GlassPanel from './GlassPanel';
-import EmptyState from './EmptyState';
-import { StatusBadge, PriorityBadge } from './StatusBadge';
-import { calcProgress, timeAgo, STATUSES } from '../utils/helpers';
-import { toast } from './Toast';
+import { StatusBadge } from './StatusBadge';
+import { calcProgress } from '../utils/helpers';
 
 /* ── 收藏夹行（左右滚动可展开） ── */
 function CollectionRow({ collections, activeId, onSelect, onRename, onDelete, onAdd }) {
@@ -166,15 +161,15 @@ export default function BookmarkManager({
   }, [bookmarkCollections]);
 
   const activeCol = bookmarkCollections.find(c => c.id === activeColId) || bookmarkCollections[0];
+  const activePluginIds = activeCol?.pluginIds || [];
   const activePlugins = useMemo(() => {
-    if (!activeCol) return [];
-    let list = plugins.filter(p => activeCol.pluginIds.includes(p.id));
+    let list = plugins.filter(p => activePluginIds.includes(p.id));
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(p => p.name?.toLowerCase().includes(q));
     }
     return list;
-  }, [plugins, activeCol, searchQuery]);
+  }, [plugins, activePluginIds, searchQuery]);
 
   return (
     <div className="fade-in">
