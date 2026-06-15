@@ -1,10 +1,20 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { Search, X, Package, Tag, Lightbulb } from 'lucide-react';
+import { Search, X, Package, Tag, Lightbulb, Layout, Milestone, Target, Hash, Rocket } from 'lucide-react';
+
+const DESTINATIONS = [
+  { key: 'kanban',     label: '插件看板', icon: Layout },
+  { key: 'milestones', label: '里程碑',   icon: Milestone },
+  { key: 'sprint',     label: '冲刺看板', icon: Target },
+  { key: 'tags',       label: '标签管理', icon: Hash },
+  { key: 'releases',   label: '版本发布', icon: Rocket },
+];
 
 export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
   const [query, setQuery] = useState('');
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [pickItem, setPickItem] = useState(null); // { item, rect } — 待选择跳转目标
   const inputRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (open) {
@@ -46,7 +56,8 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
     if (e.key === 'ArrowDown') { e.preventDefault(); setSelectedIdx(i => Math.min(i + 1, results.length - 1)); }
     if (e.key === 'ArrowUp') { e.preventDefault(); setSelectedIdx(i => Math.max(i - 1, 0)); }
     if (e.key === 'Enter' && results[selectedIdx]) {
-      onSelect?.(results[selectedIdx]);
+      // 打开跳转目的地选择
+      setPickItem({ item: results[selectedIdx] });
     }
   };
 
@@ -88,7 +99,9 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
                 className={`w-full flex items-center gap-3 px-4 sm:px-5 py-3 text-left transition-colors tap-target-nav ${
                   idx === selectedIdx ? 'bg-hermes-gold/[0.08]' : 'hover:bg-hermes-gold/[0.04]'
                 }`}
-                onClick={() => { onSelect?.(item); }}
+                onClick={(e) => {
+                  setPickItem({ item, rect: e.currentTarget.getBoundingClientRect() });
+                }}
               >
                 <span className="flex-shrink-0">
                   {item.type === 'plugin' ? <Package size={16} className="text-hermes-gold" /> :
@@ -107,6 +120,31 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
 
         {query && results.length === 0 && (
           <div className="text-center py-8 text-sm text-hermes-text-muted/40">{t('app.empty')}</div>
+        )}
+
+        {/* 跳转目的地选择浮层 */}
+        {pickItem && (
+          <div className="border-t border-hermes-border/30 py-3 px-4 sm:px-5" ref={menuRef}>
+            <p className="text-[11px] text-hermes-text-muted/50 mb-2">
+              跳转到 <span className="text-hermes-text font-medium">{pickItem.item.label}</span> 的：
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {DESTINATIONS.map(d => {
+                const Icon = d.icon;
+                return (
+                  <button
+                    key={d.key}
+                    onClick={() => { onSelect?.({ ...pickItem.item, to: d.key }); setPickItem(null); }}
+                    className="flex items-center gap-1.5 glass-btn !py-1.5 !px-3 text-xs hover:!bg-hermes-gold/10 transition-all"
+                  >
+                    <Icon size={13} className="text-hermes-gold" />
+                    {d.label}
+                  </button>
+                );
+              })}
+            </div>
+            <button onClick={() => setPickItem(null)} className="text-[11px] text-hermes-text-muted/40 mt-2 hover:text-hermes-text-muted/60">取消</button>
+          </div>
         )}
 
         {/* Footer hint */}

@@ -71,15 +71,16 @@ export default function App() {
   );
 
   /** 搜索选中：跳转到对应页面并高亮 */
-  const handleSearchResult = useCallback(({ type, id }) => {
+  const handleSearchResult = useCallback(({ type, id, to }) => {
     setGlobalSearchOpen(false);
-    if (type === 'plugin' || type === 'tag' || type === 'idea') {
-      setHighlightPluginId(id);
-      if (type === 'plugin') { setActiveTab('kanban'); setSelectedPluginId(id); }
-      else if (type === 'tag') { setActiveTab('tags'); }
-      else if (type === 'idea') { setActiveTab('milestones'); setSelectedPluginId(id); }
-      setTimeout(() => setHighlightPluginId(null), 2500);
-    }
+    if (!to && type !== 'plugin' && type !== 'tag' && type !== 'idea') return;
+    // 用户从菜单选择了目的地，或自动推断
+    const dest = to || (type === 'tag' ? 'tags' : 'kanban');
+    const pluginId = type === 'tag' ? null : id;
+    setHighlightPluginId(pluginId || id);
+    setActiveTab(dest);
+    if (pluginId && (dest === 'milestones' || dest === 'kanban')) setSelectedPluginId(pluginId);
+    setTimeout(() => setHighlightPluginId(null), 2500);
   }, []);
 
   const handleTabChange = (tab) => {
