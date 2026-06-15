@@ -109,7 +109,7 @@ function GridCard({ plugin, onEdit, onDelete, t }) {
 }
 
 /* ── 状态标签按钮（也是拖放目标） ── */
-function StatusTab({ col, active, onClick, onExternalDrop, t }) {
+function StatusTab({ col, active, onClick, t }) {
   const { setNodeRef, isOver } = useDroppable({ id: col.value });
   const [extDragOver, setExtDragOver] = useState(false);
 
@@ -126,15 +126,6 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
       onClick={onClick}
       onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setExtDragOver(true); }}
       onDragLeave={() => setExtDragOver(false)}
-      onDrop={e => {
-        e.preventDefault();
-        setExtDragOver(false);
-        const files = Array.from(e.dataTransfer.files);
-        files.forEach(f => {
-          const name = f.name.replace(/\.[^.]+$/, '');
-          onExternalDrop?.(name, col.value);
-        });
-      }}
       className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-sm text-sm font-semibold transition-all ${
         active
           ? `bg-hermes-gold/10 text-hermes-gold ring-1 ring-hermes-gold/40`
@@ -148,28 +139,13 @@ function StatusTab({ col, active, onClick, onExternalDrop, t }) {
   );
 }
 
-/* ── 网格区域本身也是拖放目标（支持 dnd-kit + 外部文件） ── */
-function GridDropZone({ status, onExternalDrop, children }) {
+/* ── 网格区域本身也是拖放目标（仅 dnd-kit，外部文件由外层统一处理） ── */
+function GridDropZone({ status, children }) {
   const { setNodeRef, isOver } = useDroppable({ id: `grid-${status}` });
-  const [extDragOver, setExtDragOver] = useState(false);
-
-  const handleNativeDrop = (e) => {
-    e.preventDefault();
-    setExtDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    files.forEach(f => {
-      const name = f.name.replace(/\.[^.]+$/, '');
-      onExternalDrop?.(name, status);
-    });
-  };
-
   return (
     <div
       ref={setNodeRef}
-      onDragOver={e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; setExtDragOver(true); }}
-      onDragLeave={() => setExtDragOver(false)}
-      onDrop={handleNativeDrop}
-      className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03] -m-1 p-1' : ''} ${extDragOver ? 'ring-2 ring-purple-400/40 bg-purple-400/5' : ''}`}
+      className={`transition-all rounded-sm ${isOver ? 'ring-2 ring-hermes-gold/30 bg-hermes-gold/[0.03] -m-1 p-1' : ''}`}
     >
       {children}
     </div>
@@ -371,14 +347,13 @@ export default function KanbanBoard({ plugins, onAddPlugin, onUpdatePlugin, onDe
               col={col}
               active={activeTab === col.value}
               onClick={() => setActiveTab(col.value)}
-              onExternalDrop={onExternalDrop}
               t={t}
             />
           ))}
         </div>
 
         {/* 当前状态插件网格（整个区域可拖放） */}
-        <GridDropZone status={activeTab} onExternalDrop={onExternalDrop}>
+        <GridDropZone status={activeTab}>
           {activeCol.items.length === 0 ? (
             <div className="text-center py-10 text-sm text-hermes-text-muted/30 glass-card">
               拖拽插件到「{t(`kanban.${activeCol.value}`)}」标签或此区域
