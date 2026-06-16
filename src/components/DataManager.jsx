@@ -7,6 +7,7 @@ export default function DataManager({ store, onImport, onReset, t }) {
   const fileRef = useRef(null);
   const [message, setMessage] = useState(null);
   const [importing, setImporting] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const showMsg = (type, text) => {
     setMessage({ type, text });
@@ -18,8 +19,7 @@ export default function DataManager({ store, onImport, onReset, t }) {
     showMsg('success', t('data.success.export'));
   };
 
-  const handleImport = async (e) => {
-    const file = e.target.files?.[0];
+  const doImport = async (file) => {
     if (!file) return;
     setImporting(true);
     try {
@@ -30,7 +30,25 @@ export default function DataManager({ store, onImport, onReset, t }) {
       showMsg('error', err.message);
     } finally {
       setImporting(false);
-      if (fileRef.current) fileRef.current.value = '';
+      setDragOver(false);
+    }
+  };
+
+  const handleImport = async (e) => {
+    const file = e.target.files?.[0];
+    await doImport(file);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.name.endsWith('.json')) {
+      await doImport(file);
+    } else {
+      showMsg('error', '仅支持 .json 文件');
     }
   };
 
@@ -91,7 +109,19 @@ export default function DataManager({ store, onImport, onReset, t }) {
           </button>
         </GlassPanel>
 
-        <GlassPanel className="flex flex-col items-center text-center py-8">
+        <GlassPanel
+          className={`flex flex-col items-center text-center py-8 relative transition-all ${
+            dragOver ? 'ring-2 ring-hermes-gold/50 bg-hermes-gold/10 scale-[1.02]' : ''
+          }`}
+          onDragOver={e => { e.preventDefault(); if (e.dataTransfer.types.includes('Files')) setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+        >
+          {dragOver && (
+            <div className="absolute inset-0 flex items-center justify-center bg-hermes-gold/5 backdrop-blur-sm rounded-sm z-10">
+              <p className="text-lg font-semibold text-hermes-gold">松开导入数据</p>
+            </div>
+          )}
           <Upload size={32} className="text-hermes-gold/40 mb-4" />
           <h3 className="text-base font-semibold text-hermes-text mb-2">{t('data.import')}</h3>
           <p className="text-xs text-hermes-text-muted/60 mb-6 max-w-xs">{t('data.import.desc')}</p>
