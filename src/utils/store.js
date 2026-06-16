@@ -345,16 +345,14 @@ export function useStore() {
   /* ──────── 全局 ──────── */
 
   const importStore = (data) => {
-    const count = data.plugins?.length || 0;
     setStore(prev => {
-      // 检测重复插件名
       const existingNames = new Set(prev.plugins.map(p => p.name));
-      const dups = (data.plugins || []).filter(p => existingNames.has(p.name)).map(p => p.name);
-      if (dups.length > 0) {
-        toast('warning', `发现 ${dups.length} 个同名插件，已跳过：${dups.slice(0, 5).join('、')}${dups.length > 5 ? `...等${dups.length}个` : ''}`);
-      }
       const newPlugins = (data.plugins || []).filter(p => !existingNames.has(p.name));
-      toast('success', `导入 ${count} 个插件${dups.length > 0 ? `（跳过 ${dups.length} 个重复）` : ''}`);
+      const dupCount = (data.plugins?.length || 0) - newPlugins.length;
+      const msg = dupCount > 0
+        ? `导入 ${newPlugins.length} 个新插件，跳过 ${dupCount} 个重复`
+        : `导入 ${newPlugins.length} 个插件`;
+      toast(dupCount > 0 ? 'warning' : 'success', msg);
       return {
         ...prev,
         plugins: [...prev.plugins, ...newPlugins],
