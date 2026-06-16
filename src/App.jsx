@@ -25,9 +25,8 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [highlightPluginId, setHighlightPluginId] = useState(null);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [sidebarHidden, setSidebarHidden] = useState(false);
   const hideTimer = useRef(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const {
     store, addPlugin, updatePlugin, deletePlugin, movePluginStatus, movePluginTo, reorderPlugins,
@@ -46,13 +45,6 @@ export default function App() {
   const lang = settings.language || 'zh';
   const t = useT(lang);
   const autoHide = settings.autoHide || false;
-
-  // ── 响应式 ──
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
 
   // ── 同步主题类名到 <html> ──
   useEffect(() => {
@@ -73,11 +65,10 @@ export default function App() {
     [plugins, selectedPluginId]
   );
 
-  /** 搜索选中：跳转到对应页面并高亮 */
+  /** 搜索选中 */
   const handleSearchResult = useCallback(({ type, id, to }) => {
     setGlobalSearchOpen(false);
     if (!to && type !== 'plugin' && type !== 'tag' && type !== 'idea') return;
-    // 用户从菜单选择了目的地，或自动推断
     const dest = to || (type === 'tag' ? 'tags' : 'kanban');
     const pluginId = type === 'tag' ? null : id;
     setHighlightPluginId(pluginId || id);
@@ -117,32 +108,28 @@ export default function App() {
   // ── 自动隐藏侧边栏 ──
   const handleSidebarEnter = useCallback(() => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
-    setSidebarVisible(true);
+    setSidebarHidden(false);
   }, []);
 
   const handleSidebarLeave = useCallback(() => {
-    hideTimer.current = setTimeout(() => setSidebarVisible(false), 400);
+    hideTimer.current = setTimeout(() => setSidebarHidden(true), 400);
   }, []);
 
   const handleTriggerEnter = useCallback(() => {
-    setSidebarVisible(true);
+    setSidebarHidden(false);
   }, []);
 
   // ── 键盘快捷键 ──
   useEffect(() => {
     const handleKey = (e) => {
-      // Ctrl+N / ⌘+N → 切换到看板并打开新建
       if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
         e.preventDefault();
         setActiveTab('kanban');
       }
-      // Ctrl+F / ⌘+F → 聚焦搜索（触发看板的搜索）
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
         e.preventDefault();
-        // 触发全局搜索弹窗
         setGlobalSearchOpen(true);
       }
-      // Escape → 关闭设置
       if (e.key === 'Escape' && settingsOpen) {
         setSettingsOpen(false);
       }
@@ -158,12 +145,10 @@ export default function App() {
       <div className="bg-orb bg-orb-2" />
       <div className="bg-orb bg-orb-3" />
 
-      {/* 触发区 - 仅桌面端自动隐藏模式 */}
-      {(autoHide && !sidebarVisible && !isMobile) && (
-        <div
-          onMouseEnter={handleTriggerEnter}
-          className="fixed left-0 top-0 bottom-0 w-[8px] z-50 cursor-default"
-        />
+      {/* 触发区 - autoHide 模式 */}
+      {autoHide && sidebarHidden && (
+        <div onMouseEnter={handleTriggerEnter}
+          className="fixed left-0 top-0 bottom-0 w-[8px] z-50 cursor-default" />
       )}
 
       {/* Sidebar */}
@@ -174,78 +159,45 @@ export default function App() {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         pluginCount={plugins.length}
         t={t}
-        onOpenSettings={() => { setSettingsOpen(true); if (isMobile) setSidebarCollapsed(true); }}
-        visible={isMobile ? !sidebarCollapsed : sidebarVisible}
-        autoHide={autoHide}
+        onOpenSettings={() => setSettingsOpen(true)}
+        hidden={autoHide && sidebarHidden}
         onMouseEnter={handleSidebarEnter}
         onMouseLeave={handleSidebarLeave}
-        isMobile={isMobile}
-        onMobileClose={() => setSidebarCollapsed(true)}
       />
 
       <ToastContainer />
 
-      {/* Global Search */}
-      <GlobalSearch
-        open={globalSearchOpen}
-        onClose={() => setGlobalSearchOpen(false)}
-        onSelect={handleSearchResult}
-        plugins={plugins}
-        t={t}
-      />
+      <GlobalSearch open={globalSearchOpen} onClose={() => setGlobalSearchOpen(false)}
+        onSelect={handleSearchResult} plugins={plugins} t={t} />
 
-      {/* Settings Modal */}
       <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} title={t('settings.title')}>
         <SettingsPanel settings={settings} onUpdate={updateSettings} t={t} />
       </Modal>
 
-      {/* 移动端汉堡按钮 - 仅在侧边栏收起时显示 */}
-      {isMobile && sidebarCollapsed && (
-        <button
-          onClick={() => setSidebarCollapsed(false)}
-          className="fixed top-4 left-4 z-40 w-11 h-11 glass flex items-center justify-center tap-target"
-          aria-label="打开菜单"
-        >
-          <div className="space-y-1">
-            <span className="block w-5 h-[2px] bg-hermes-text rounded" />
-            <span className="block w-5 h-[2px] bg-hermes-text rounded" />
-            <span className="block w-5 h-[2px] bg-hermes-text rounded" />
-          </div>
-        </button>
-      )}
-
       {/* Main Content */}
       <main
         className="relative z-10 min-h-screen transition-all duration-300"
-        style={{ marginLeft: isMobile ? 0 : (sidebarCollapsed ? 60 : 220) }}
+        style={{ marginLeft: sidebarCollapsed ? 60 : 220 }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-          {/* 搜索按钮（每个页面通用） */}
-          <button
-            onClick={() => setGlobalSearchOpen(true)}
+          {/* 搜索按钮 */}
+          <button onClick={() => setGlobalSearchOpen(true)}
             className="fixed bottom-6 right-6 z-40 w-12 h-12 glass flex items-center justify-center rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all tap-target"
-            aria-label={t('app.search')}
-            title={t('app.search')}
-          >
+            aria-label={t('app.search')} title={t('app.search')}>
             <Search size={20} className="text-hermes-gold" />
           </button>
 
           {activeTab === 'kanban' && (
             <KanbanBoard
-              plugins={plugins}
-              highlightPluginId={highlightPluginId}
+              plugins={plugins} highlightPluginId={highlightPluginId}
               bookmarkCollections={store.bookmarkCollections || []}
               onAddPluginToBookmark={addPluginToBookmark}
               onRemovePluginFromBookmark={removePluginFromBookmark}
               onAddBookmarkCollection={addBookmarkCollection}
-              onAddPlugin={addPlugin}
-              onUpdatePlugin={updatePlugin}
+              onAddPlugin={addPlugin} onUpdatePlugin={updatePlugin}
               onDeletePlugin={handleDeletePlugin}
-              onMoveStatus={movePluginStatus}
-              onMoveTo={movePluginTo}
-              onReorder={reorderPlugins}
-              onExternalDrop={handleExternalDrop}
-              t={t}
+              onMoveStatus={movePluginStatus} onMoveTo={movePluginTo}
+              onReorder={reorderPlugins} onExternalDrop={handleExternalDrop} t={t}
             />
           )}
 
@@ -258,13 +210,8 @@ export default function App() {
                   </h3>
                   <div className="space-y-1">
                     {plugins.map(p => (
-                      <button
-                        key={p.id}
-                        onClick={() => setSelectedPluginId(p.id)}
-                        className={`w-full text-left px-3 py-2 text-sm transition-all ${
-                          selectedPluginId === p.id ? 'nav-active' : 'nav-inactive'
-                        }`}
-                      >
+                      <button key={p.id} onClick={() => setSelectedPluginId(p.id)}
+                        className={`w-full text-left px-3 py-2 text-sm transition-all ${selectedPluginId === p.id ? 'nav-active' : 'nav-inactive'}`}>
                         {p.name || t('kanban.noName')}
                       </button>
                     ))}
@@ -272,58 +219,35 @@ export default function App() {
                 </div>
               </div>
               <div className="flex-1">
-                <MilestoneTracker
-                  plugin={selectedPlugin}
-                  highlightPluginId={highlightPluginId}
-                  onAddMilestone={addMilestone}
-                  onUpdateMilestone={updateMilestone}
-                  onDeleteMilestone={deleteMilestone}
-                  onToggleTask={toggleTask}
-                  onAddTask={addTask}
-                  onDeleteTask={deleteTask}
-                  t={t}
-                />
+                <MilestoneTracker plugin={selectedPlugin} highlightPluginId={highlightPluginId}
+                  onAddMilestone={addMilestone} onUpdateMilestone={updateMilestone}
+                  onDeleteMilestone={deleteMilestone} onToggleTask={toggleTask}
+                  onAddTask={addTask} onDeleteTask={deleteTask} t={t} />
               </div>
             </div>
           )}
 
           {activeTab === 'sprint' && <SprintBoard plugins={plugins} highlightPluginId={highlightPluginId} t={t} />}
           {activeTab === 'ideas' && (
-            <IdeaVault
-              plugins={plugins} storeIdeas={standaloneIdeas}
-              onAddIdea={addIdea} onUpdateIdea={updateIdea} onDeleteIdea={deleteIdea}
-              t={t} lang={lang}
-            />
+            <IdeaVault plugins={plugins} storeIdeas={standaloneIdeas}
+              onAddIdea={addIdea} onUpdateIdea={updateIdea} onDeleteIdea={deleteIdea} t={t} lang={lang} />
           )}
           {activeTab === 'timeline' && <TimelineView plugins={plugins} t={t} />}
           {activeTab === 'stats' && <StatsDashboard plugins={plugins} t={t} />}
           {activeTab === 'releases' && (
-            <ReleaseLog
-              plugins={plugins} highlightPluginId={highlightPluginId}
-              onAddRelease={addRelease}
-              onDeleteRelease={deleteRelease}
-              onUpdateRelease={updateRelease}
-              onPinRelease={pinRelease}
-              t={t}
-            />
+            <ReleaseLog plugins={plugins} highlightPluginId={highlightPluginId}
+              onAddRelease={addRelease} onDeleteRelease={deleteRelease}
+              onUpdateRelease={updateRelease} onPinRelease={pinRelease} t={t} />
           )}
           {activeTab === 'tags' && (
-            <TagManager
-              plugins={plugins} highlightPluginId={highlightPluginId} storeTags={store.tags || []}
-              onAddTag={addTag} onRemoveTag={removeTag} t={t}
-            />
+            <TagManager plugins={plugins} highlightPluginId={highlightPluginId}
+              storeTags={store.tags || []} onAddTag={addTag} onRemoveTag={removeTag} t={t} />
           )}
           {activeTab === 'bookmarks' && (
-            <BookmarkManager
-              plugins={plugins}
-              bookmarkCollections={store.bookmarkCollections || []}
-              onAddCollection={addBookmarkCollection}
-              onRemoveCollection={removeBookmarkCollection}
+            <BookmarkManager plugins={plugins} bookmarkCollections={store.bookmarkCollections || []}
+              onAddCollection={addBookmarkCollection} onRemoveCollection={removeBookmarkCollection}
               onRenameCollection={renameBookmarkCollection}
-              onAddPlugin={addPluginToBookmark}
-              onRemovePlugin={removePluginFromBookmark}
-              t={t}
-            />
+              onAddPlugin={addPluginToBookmark} onRemovePlugin={removePluginFromBookmark} t={t} />
           )}
           {activeTab === 'data' && (
             <DataManager store={store} onImport={importStore} onReset={resetStore} t={t} />
