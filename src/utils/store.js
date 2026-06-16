@@ -351,7 +351,7 @@ export function useStore() {
     const msg = dups.length > 0
       ? `导入 ${newPlugins.length} 个新插件，跳过 ${dups.length} 个重复：${dups.map(p => p.name).slice(0, 8).join('、')}${dups.length > 8 ? `...等${dups.length}个` : ''}`
       : `导入 ${newPlugins.length} 个插件`;
-    toast(dupCount > 0 ? 'warning' : 'success', msg);
+    toast(dups.length > 0 ? 'warning' : 'success', msg);
     setStore(prev => ({
       ...prev,
       plugins: [...prev.plugins, ...newPlugins],
