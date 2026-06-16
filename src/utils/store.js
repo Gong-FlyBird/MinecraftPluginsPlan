@@ -346,15 +346,23 @@ export function useStore() {
 
   const importStore = (data) => {
     const count = data.plugins?.length || 0;
-    toast('success', `已导入 ${count} 个插件`);
-    // 只导入内容数据，不覆盖 settings（主题/语言等保持当前）
-    setStore(prev => ({
-      ...prev,
-      plugins: data.plugins || [],
-      standaloneIdeas: data.standaloneIdeas || [],
-      tags: data.tags || [],
-      bookmarkCollections: data.bookmarkCollections || prev.bookmarkCollections || [],
-    }));
+    setStore(prev => {
+      // 检测重复插件名
+      const existingNames = new Set(prev.plugins.map(p => p.name));
+      const dups = (data.plugins || []).filter(p => existingNames.has(p.name)).map(p => p.name);
+      if (dups.length > 0) {
+        toast('warning', `发现 ${dups.length} 个同名插件，已跳过：${dups.slice(0, 5).join('、')}${dups.length > 5 ? `...等${dups.length}个` : ''}`);
+      }
+      const newPlugins = (data.plugins || []).filter(p => !existingNames.has(p.name));
+      toast('success', `导入 ${count} 个插件${dups.length > 0 ? `（跳过 ${dups.length} 个重复）` : ''}`);
+      return {
+        ...prev,
+        plugins: [...prev.plugins, ...newPlugins],
+        standaloneIdeas: data.standaloneIdeas || [],
+        tags: data.tags || [],
+        bookmarkCollections: data.bookmarkCollections || prev.bookmarkCollections || [],
+      };
+    });
   };
 
   const resetStore = () => {
