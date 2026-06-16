@@ -128,13 +128,6 @@ export default function App() {
     setSidebarVisible(true);
   }, []);
 
-  // 主内容左边距（移动端侧边栏覆盖，不计入）
-  const sidebarWidth = isMobile ? '0px' : (
-    autoHide
-      ? (sidebarVisible ? (sidebarCollapsed ? '60px' : '220px') : '0px')
-      : (sidebarCollapsed ? '60px' : '220px')
-  );
-
   // ── 键盘快捷键 ──
   useEffect(() => {
     const handleKey = (e) => {
@@ -159,7 +152,7 @@ export default function App() {
   }, [settingsOpen]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex">
       {/* Background Orbs */}
       <div className="bg-orb bg-orb-1" />
       <div className="bg-orb bg-orb-2" />
@@ -223,8 +216,7 @@ export default function App() {
 
       {/* Main Content */}
       <main
-        style={{ marginLeft: sidebarWidth }}
-        className="relative z-10 min-h-screen transition-all duration-300"
+        className="relative z-10 min-h-screen flex-1 transition-all duration-300"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* 搜索按钮（每个页面通用） */}
