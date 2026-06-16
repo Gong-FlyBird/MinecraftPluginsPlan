@@ -195,7 +195,7 @@ const zh = {
   'data.export.desc': '将所有插件、里程碑、任务和灵感导出为标准 JSON 文件',
   'data.export.btn': '导出 JSON',
   'data.import': '导入数据',
-  'data.import.desc': '从之前导出的 JSON 文件恢复所有数据（会覆盖当前数据）',
+  'data.import.desc': '从之前导出的 JSON 文件恢复所有数据（会覆盖当前数据）[可直接从外部拖入 JSON 文件到此处]',
   'data.import.btn': '导入 JSON',
   'data.import.progress': '导入中…',
   'data.danger': '危险区域',

@@ -346,10 +346,10 @@ export function useStore() {
 
   const importStore = (data) => {
     const existingNames = new Set(store.plugins.map(p => p.name));
+    const dups = (data.plugins || []).filter(p => existingNames.has(p.name));
     const newPlugins = (data.plugins || []).filter(p => !existingNames.has(p.name));
-    const dupCount = (data.plugins?.length || 0) - newPlugins.length;
-    const msg = dupCount > 0
-      ? `导入 ${newPlugins.length} 个新插件，跳过 ${dupCount} 个重复`
+    const msg = dups.length > 0
+      ? `导入 ${newPlugins.length} 个新插件，跳过 ${dups.length} 个重复：${dups.map(p => p.name).slice(0, 8).join('、')}${dups.length > 8 ? `...等${dups.length}个` : ''}`
       : `导入 ${newPlugins.length} 个插件`;
     toast(dupCount > 0 ? 'warning' : 'success', msg);
     setStore(prev => ({
