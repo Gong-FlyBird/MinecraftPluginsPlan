@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import {
   LayoutDashboard, ListTodo, Lightbulb, Clock, Database,
   BarChart3, Target, Tag, ChevronLeft, Package, Settings, X, Bookmark,
@@ -23,7 +23,6 @@ export default function Sidebar({
   onMouseEnter, onMouseLeave,
   isMobile, onMobileClose,
 }) {
-  const [mobileTop, setMobileTop] = useState(0);
   const prevHidden = useRef(isMobile ? collapsed : hidden);
   const activeRef = useRef(null);
 
@@ -36,16 +35,13 @@ export default function Sidebar({
 
   const widthClass = collapsed ? 'w-[60px]' : isMobile ? 'w-[280px] max-w-[85vw]' : 'w-[220px]';
 
-  // 手机侧边栏打开时记录 scrollY 位置 + 锁定 body 滚动
+  // 手机侧边栏打开时锁定 body 滚动（关闭时还原）
   useEffect(() => {
     if (isMobile) {
       const now = collapsed;
       if (!now && prevHidden.current) {
-        // 打开 → 记录位置 + 锁滚动
-        setMobileTop(window.scrollY);
         document.body.style.overflow = 'hidden';
       } else if (now && !prevHidden.current) {
-        // 关闭 → 解锁滚动
         document.body.style.overflow = '';
       }
       prevHidden.current = now;
@@ -68,7 +64,6 @@ export default function Sidebar({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
-        style={isMobile ? { top: collapsed ? 0 : mobileTop } : undefined}
       >
         <div className="absolute inset-0 sidebar-glass" />
 
