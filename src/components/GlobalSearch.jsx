@@ -76,12 +76,13 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
       >
         {/* Input */}
         <div className="flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 border-b border-hermes-border/30">
-          <Search size={18} className="text-hermes-text-muted/40 flex-shrink-0" />
+          <Search size={18} className="text-hermes-gold/60 flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={e => { setQuery(e.target.value); setSelectedIdx(0); }}
+            onKeyDown={handleKey}
             placeholder={t('app.search')}
             className="flex-1 bg-transparent border-none outline-none text-base text-hermes-text placeholder:text-hermes-text-muted/30"
           />
