@@ -196,7 +196,7 @@ export default function App() {
       {/* Main Content */}
       <main
         className="relative z-10 min-h-screen transition-all duration-300"
-        style={{ marginLeft: isMobile ? (sidebarCollapsed ? 60 : 280) : (sidebarCollapsed ? 60 : 220) }}
+        style={{ marginLeft: isMobile ? 0 : (sidebarCollapsed ? 60 : 220) }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* 搜索按钮 */}
