@@ -84,7 +84,7 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
             onChange={e => { setQuery(e.target.value); setSelectedIdx(0); }}
             onKeyDown={handleKey}
             placeholder={t('app.search')}
-            className="flex-1 bg-transparent border-none outline-none text-base text-hermes-text placeholder:text-hermes-text-muted/30"
+            className="flex-1 bg-transparent border-none outline-none text-base text-black/80 placeholder:text-black/30"
           />
           <button onClick={onClose} className="text-hermes-text-muted/30 hover:text-hermes-text-muted/60 tap-target flex items-center justify-center">
             <X size={18} />
