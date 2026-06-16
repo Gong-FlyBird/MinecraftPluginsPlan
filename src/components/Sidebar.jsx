@@ -23,9 +23,11 @@ export default function Sidebar({
   isMobile, onMobileClose,
 }) {
   const widthClass = collapsed ? 'w-[60px]' : isMobile ? 'w-[280px] max-w-[85vw]' : 'w-[220px]';
+  // 手机用 transform 滑入滑出；桌面不下任何 translate（transform 会禁用 sticky）
+  // autoHide 模式下用 invisible+opacity 替代 translate 隐藏
   const hiddenClass = isMobile
     ? (collapsed ? '-translate-x-full' : 'translate-x-0')
-    : (autoHide && !visible ? '-translate-x-full' : 'translate-x-0');
+    : (autoHide && !visible ? 'invisible opacity-0 pointer-events-none' : '');
 
   return (
     <>
@@ -40,7 +42,7 @@ export default function Sidebar({
       <aside
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`${isMobile ? 'fixed left-0 top-0 h-full' : 'sticky top-0 h-screen flex-shrink-0'} z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
+        className={`${isMobile ? 'fixed left-0 top-0 h-full' : 'sticky top-0 h-screen flex-shrink-0 self-start'} z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
       >
         <div className="absolute inset-0 sidebar-glass" />
 
