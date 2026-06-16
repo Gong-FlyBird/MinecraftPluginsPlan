@@ -149,7 +149,7 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
         )}
 
         {/* Footer hint */}
-        <div className="px-4 sm:px-5 py-2 border-t border-hermes-border/30 text-[10px] text-hermes-text-muted/30 flex gap-3 sm:gap-4 flex-wrap">
+        <div className="px-4 sm:px-5 py-2 border-t border-hermes-border/30 text-[10px] text-black/40 flex gap-3 sm:gap-4 flex-wrap">
           <span>↑↓ 导航</span>
           <span>Enter 选择</span>
           <span>Esc 关闭</span>
