@@ -365,7 +365,10 @@ export function useStore() {
 
   const resetStore = () => {
     toast('success', '数据已重置');
-    setStore(INITIAL_STORE);
+    setStore(prev => ({
+      ...INITIAL_STORE,
+      settings: prev.settings,
+    }));
   };
 
   return {
