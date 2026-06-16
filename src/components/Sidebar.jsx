@@ -40,7 +40,7 @@ export default function Sidebar({
       <aside
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`sticky top-0 h-screen z-40 flex-shrink-0 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
+        className={`${isMobile ? 'fixed left-0 top-0 h-full' : 'sticky top-0 h-screen flex-shrink-0'} z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
       >
         <div className="absolute inset-0 sidebar-glass" />
 

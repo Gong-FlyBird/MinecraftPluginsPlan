@@ -152,7 +152,7 @@ export default function App() {
   }, [settingsOpen]);
 
   return (
-    <div className="min-h-screen flex">
+    <div className={`min-h-screen ${!isMobile ? 'flex' : ''}`}>
       {/* Background Orbs */}
       <div className="bg-orb bg-orb-1" />
       <div className="bg-orb bg-orb-2" />
