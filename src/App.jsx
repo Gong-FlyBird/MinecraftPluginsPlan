@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useStore } from './utils/store';
 import { useT } from './utils/i18n';
-import { Search } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import KanbanBoard from './components/KanbanBoard';
 import MilestoneTracker from './components/MilestoneTracker';
@@ -27,6 +27,7 @@ export default function App() {
   const [highlightPluginId, setHighlightPluginId] = useState(null);
   const [sidebarHidden, setSidebarHidden] = useState(false);
   const hideTimer = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const {
     store, addPlugin, updatePlugin, deletePlugin, movePluginStatus, movePluginTo, reorderPlugins,
@@ -45,6 +46,13 @@ export default function App() {
   const lang = settings.language || 'zh';
   const t = useT(lang);
   const autoHide = settings.autoHide || false;
+
+  // ── 响应式 ──
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // ── 同步主题类名到 <html> ──
   useEffect(() => {
@@ -145,8 +153,8 @@ export default function App() {
       <div className="bg-orb bg-orb-2" />
       <div className="bg-orb bg-orb-3" />
 
-      {/* 触发区 - autoHide 模式 */}
-      {autoHide && sidebarHidden && (
+      {/* 触发区 - 桌面 autoHide */}
+      {!isMobile && autoHide && sidebarHidden && (
         <div onMouseEnter={handleTriggerEnter}
           className="fixed left-0 top-0 bottom-0 w-[8px] z-50 cursor-default" />
       )}
@@ -160,10 +168,21 @@ export default function App() {
         pluginCount={plugins.length}
         t={t}
         onOpenSettings={() => setSettingsOpen(true)}
-        hidden={autoHide && sidebarHidden}
+        hidden={!isMobile && autoHide && sidebarHidden}
         onMouseEnter={handleSidebarEnter}
         onMouseLeave={handleSidebarLeave}
+        isMobile={isMobile}
+        onMobileClose={() => setSidebarCollapsed(true)}
       />
+
+      {/* 移动端汉堡按钮 */}
+      {isMobile && sidebarCollapsed && (
+        <button onClick={() => setSidebarCollapsed(false)}
+          className="fixed top-4 left-4 z-40 w-11 h-11 glass flex items-center justify-center tap-target"
+          aria-label="打开菜单">
+          <Menu size={20} className="text-hermes-text" />
+        </button>
+      )}
 
       <ToastContainer />
 
@@ -177,7 +196,7 @@ export default function App() {
       {/* Main Content */}
       <main
         className="relative z-10 min-h-screen transition-all duration-300"
-        style={{ marginLeft: sidebarCollapsed ? 60 : 220 }}
+        style={{ marginLeft: isMobile ? (sidebarCollapsed ? 60 : 280) : (sidebarCollapsed ? 60 : 220) }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* 搜索按钮 */}

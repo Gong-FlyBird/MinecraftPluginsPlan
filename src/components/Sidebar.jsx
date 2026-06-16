@@ -1,6 +1,7 @@
+import { useState, useRef, useEffect } from 'react';
 import {
   LayoutDashboard, ListTodo, Lightbulb, Clock, Database,
-  BarChart3, Target, Tag, ChevronLeft, Package, Settings, Bookmark,
+  BarChart3, Target, Tag, ChevronLeft, Package, Settings, X, Bookmark,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -16,89 +17,121 @@ const NAV_ITEMS = [
   { id: 'bookmarks', labelKey: 'sidebar.bookmarks', icon: Bookmark, descKey: 'sidebar.bookmarks.desc' },
 ];
 
-/**
- * 固定左侧边栏 — 所有屏幕统一行为
- * collapsed → 图标模式 60px；展开 → 220px
- */
 export default function Sidebar({
   activeTab, onTabChange, collapsed, onToggle, pluginCount, t, onOpenSettings,
   hidden = false,
   onMouseEnter, onMouseLeave,
+  isMobile, onMobileClose,
 }) {
-  const w = collapsed ? 'w-[60px]' : 'w-[220px]';
+  const [mobileTop, setMobileTop] = useState(0);
+  const prevHidden = useRef(isMobile ? collapsed : hidden);
+
+  const widthClass = collapsed ? 'w-[60px]' : isMobile ? 'w-[280px] max-w-[85vw]' : 'w-[220px]';
+
+  // 手机侧边栏打开时记录 scrollY 位置 + 锁定 body 滚动
+  useEffect(() => {
+    if (isMobile) {
+      const now = collapsed;
+      if (!now && prevHidden.current) {
+        // 打开 → 记录位置 + 锁滚动
+        setMobileTop(window.scrollY);
+        document.body.style.overflow = 'hidden';
+      } else if (now && !prevHidden.current) {
+        // 关闭 → 解锁滚动
+        document.body.style.overflow = '';
+      }
+      prevHidden.current = now;
+    }
+    return () => { if (isMobile) document.body.style.overflow = ''; };
+  }, [isMobile, collapsed]);
+
+  const hiddenClass = isMobile
+    ? (collapsed ? '-translate-x-full' : 'translate-x-0')
+    : (hidden ? '-translate-x-full' : '');
 
   return (
-    <aside
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${w} ${hidden ? '-translate-x-full' : ''}`}
-    >
-      <div className="absolute inset-0 sidebar-glass" />
+    <>
+      {/* 移动端遮罩 */}
+      {isMobile && !collapsed && (
+        <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm" onClick={onMobileClose} />
+      )}
 
-      <div className="relative flex flex-col h-full py-4">
-        {/* 折叠按钮 */}
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10"
-        >
-          <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
-        </button>
+      <aside
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
+        style={isMobile ? { top: collapsed ? 0 : mobileTop } : undefined}
+      >
+        <div className="absolute inset-0 sidebar-glass" />
 
-        {/* Logo */}
-        <div className="px-4 mb-8 flex items-center gap-3">
-          <div className="w-8 h-8 bg-hermes-gold/10 border border-hermes-gold/20 flex items-center justify-center flex-shrink-0">
-            <Package size={16} className="text-hermes-gold" />
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <h2 className="text-sm font-bold text-hermes-text leading-tight">{t('app.title')}</h2>
-              <p className="text-[10px] text-hermes-text-muted/50">{t('app.subtitle', { count: pluginCount })}</p>
-            </div>
+        <div className="relative flex flex-col h-full py-4">
+          {/* 关闭按钮（手机） */}
+          {isMobile && !collapsed && (
+            <button onClick={onMobileClose}
+              className="absolute top-3 right-3 w-8 h-8 glass flex items-center justify-center tap-target z-20">
+              <X size={18} className="text-hermes-text-muted/60" />
+            </button>
           )}
-        </div>
 
-        {/* Nav Items */}
-        <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map(item => {
-            const isActive = activeTab === item.id;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => onTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
-                  isActive ? 'nav-active' : 'nav-inactive'
-                }`}
-                title={collapsed ? t(item.labelKey) : undefined}
-              >
-                <Icon size={18} className="flex-shrink-0" />
-                {!collapsed && (
-                  <div className="min-w-0">
-                    <span className="text-sm font-medium block leading-tight">{t(item.labelKey)}</span>
-                    <span className="text-[10px] text-hermes-text-muted/40">{t(item.descKey)}</span>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+          {/* 折叠按钮（桌面） */}
+          {!isMobile && (
+            <button onClick={onToggle}
+              className="absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10">
+              <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
+            </button>
+          )}
 
-        {/* Settings */}
-        <div className="px-2 mt-2">
-          <button
-            onClick={() => onOpenSettings()}
-            className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
-              activeTab === 'settings' ? 'nav-active' : 'nav-inactive'
-            }`}
-            title={collapsed ? t('sidebar.settings') : undefined}
-          >
-            <Settings size={18} className="flex-shrink-0" />
+          {/* Logo */}
+          <div className={`px-4 mb-8 flex items-center gap-3 ${isMobile && !collapsed ? 'pr-12' : ''}`}>
+            <div className="w-8 h-8 bg-hermes-gold/10 border border-hermes-gold/20 flex items-center justify-center flex-shrink-0">
+              <Package size={16} className="text-hermes-gold" />
+            </div>
             {!collapsed && (
-              <span className="text-sm font-medium block">{t('sidebar.settings')}</span>
+              <div className="min-w-0">
+                <h2 className="text-sm font-bold text-hermes-text leading-tight">{t('app.title')}</h2>
+                <p className="text-[10px] text-hermes-text-muted/50">{t('app.subtitle', { count: pluginCount })}</p>
+              </div>
             )}
-          </button>
+          </div>
+
+          {/* Nav Items */}
+          <nav className="flex-1 px-2 space-y-1 overflow-y-auto scrollbar-hide">
+            {NAV_ITEMS.map(item => {
+              const isActive = activeTab === item.id;
+              const Icon = item.icon;
+              return (
+                <button key={item.id}
+                  onClick={() => { onTabChange(item.id); if (isMobile) onMobileClose(); }}
+                  className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
+                    isActive ? 'nav-active scale-[1.02]' : 'nav-inactive'
+                  } ${isMobile && !collapsed ? 'py-4 text-base' : ''}`}
+                  title={collapsed ? t(item.labelKey) : undefined}
+                >
+                  <Icon size={isMobile && !collapsed ? 22 : 18} className="flex-shrink-0" />
+                  {!collapsed && (
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium block leading-tight">{t(item.labelKey)}</span>
+                      {!isMobile && <span className="text-[10px] text-hermes-text-muted/40">{t(item.descKey)}</span>}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Settings */}
+          <div className="px-2 mt-2">
+            <button onClick={() => { onOpenSettings(); if (isMobile) onMobileClose(); }}
+              className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
+                activeTab === 'settings' ? 'nav-active' : 'nav-inactive'
+              } ${isMobile && !collapsed ? 'py-4 text-base' : ''}`}
+              title={collapsed ? t('sidebar.settings') : undefined}>
+              <Settings size={isMobile && !collapsed ? 22 : 18} className="flex-shrink-0" />
+              {!collapsed && <span className="text-sm font-medium block">{t('sidebar.settings')}</span>}
+            </button>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
