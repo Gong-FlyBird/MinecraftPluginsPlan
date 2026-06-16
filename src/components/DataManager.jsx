@@ -113,12 +113,12 @@ export default function DataManager({ store, onImport, onReset, t }) {
           className={`flex flex-col items-center text-center py-8 relative transition-all ${
             dragOver ? 'ring-2 ring-hermes-gold/50 bg-hermes-gold/10 scale-[1.02]' : ''
           }`}
-          onDragOver={e => { e.preventDefault(); if (e.dataTransfer.types.includes('Files')) setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
+          onDragOver={e => { e.preventDefault(); e.stopPropagation(); if (Array.from(e.dataTransfer.types).includes('Files')) setDragOver(true); }}
+          onDragLeave={e => { e.preventDefault(); e.stopPropagation(); setDragOver(false); }}
           onDrop={handleDrop}
         >
           {dragOver && (
-            <div className="absolute inset-0 flex items-center justify-center bg-hermes-gold/5 backdrop-blur-sm rounded-sm z-10">
+            <div className="absolute inset-0 flex items-center justify-center bg-hermes-gold/5 backdrop-blur-sm rounded-sm z-10 pointer-events-none">
               <p className="text-lg font-semibold text-hermes-gold">松开导入数据</p>
             </div>
           )}

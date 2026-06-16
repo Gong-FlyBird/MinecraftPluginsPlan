@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import {
   LayoutDashboard, ListTodo, Lightbulb, Clock, Database,
   BarChart3, Target, Tag, ChevronLeft, Package, Settings, X, Bookmark,
@@ -22,7 +23,17 @@ export default function Sidebar({
   onMouseEnter, onMouseLeave,
   isMobile, onMobileClose,
 }) {
+  const [mobileTop, setMobileTop] = useState(0);
+  const prevCollapsed = useRef(collapsed);
   const widthClass = collapsed ? 'w-[60px]' : isMobile ? 'w-[280px] max-w-[85vw]' : 'w-[220px]';
+
+  // 手机侧边栏打开时记录当前 scrollY → 固定在该位置而非顶部
+  useEffect(() => {
+    if (isMobile && !collapsed && prevCollapsed.current) {
+      setMobileTop(window.scrollY);
+    }
+    prevCollapsed.current = collapsed;
+  }, [isMobile, collapsed]);
   // 手机用 transform 滑入滑出；桌面不下任何 translate（transform 会禁用 sticky）
   // autoHide 模式下用 invisible+opacity 替代 translate 隐藏
   const hiddenClass = isMobile
@@ -42,7 +53,8 @@ export default function Sidebar({
       <aside
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`${isMobile ? 'fixed left-0 top-0 h-full' : 'sticky top-0 h-screen flex-shrink-0 self-start'} z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
+        className={`${isMobile ? 'fixed left-0 h-full' : 'sticky top-0 h-screen flex-shrink-0 self-start'} z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
+        style={isMobile ? { top: collapsed ? 0 : mobileTop } : undefined}
       >
         <div className="absolute inset-0 sidebar-glass" />
 
