@@ -152,7 +152,7 @@ export default function App() {
   }, [settingsOpen]);
 
   return (
-    <div className={`min-h-screen ${!isMobile ? 'flex' : ''}`}>
+    <div className="min-h-screen">
       {/* Background Orbs */}
       <div className="bg-orb bg-orb-1" />
       <div className="bg-orb bg-orb-2" />
@@ -216,7 +216,8 @@ export default function App() {
 
       {/* Main Content */}
       <main
-        className="relative z-10 min-h-screen flex-1 transition-all duration-300"
+        className="relative z-10 min-h-screen transition-all duration-300"
+        style={{ marginLeft: isMobile ? 0 : (sidebarCollapsed ? 60 : 220) }}
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {/* 搜索按钮（每个页面通用） */}

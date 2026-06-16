@@ -347,13 +347,14 @@ export function useStore() {
   const importStore = (data) => {
     const count = data.plugins?.length || 0;
     toast('success', `已导入 ${count} 个插件`);
-    setStore({
-      ...INITIAL_STORE,
-      ...data,
+    // 只导入内容数据，不覆盖 settings（主题/语言等保持当前）
+    setStore(prev => ({
+      ...prev,
       plugins: data.plugins || [],
       standaloneIdeas: data.standaloneIdeas || [],
       tags: data.tags || [],
-    });
+      bookmarkCollections: data.bookmarkCollections || prev.bookmarkCollections || [],
+    }));
   };
 
   const resetStore = () => {

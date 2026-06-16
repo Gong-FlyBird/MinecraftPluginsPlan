@@ -38,7 +38,7 @@ export default function Sidebar({
   // autoHide 模式下用 invisible+opacity 替代 translate 隐藏
   const hiddenClass = isMobile
     ? (collapsed ? '-translate-x-full' : 'translate-x-0')
-    : (autoHide && !visible ? 'invisible opacity-0 pointer-events-none' : '');
+    : (autoHide && !visible ? '-translate-x-full' : '');
 
   return (
     <>
@@ -53,7 +53,7 @@ export default function Sidebar({
       <aside
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={`${isMobile ? 'fixed left-0 h-full' : 'sticky top-0 h-screen flex-shrink-0 self-start'} z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
+        className={`fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out ${widthClass} ${hiddenClass}`}
         style={isMobile ? { top: collapsed ? 0 : mobileTop } : undefined}
       >
         <div className="absolute inset-0 sidebar-glass" />
