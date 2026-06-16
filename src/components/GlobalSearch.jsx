@@ -110,10 +110,10 @@ export default function GlobalSearch({ open, onClose, onSelect, plugins, t }) {
                    <Lightbulb size={16} className="text-amber-400" />}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm text-hermes-text block truncate">{item.label}</span>
-                  <span className="text-[11px] text-hermes-text-muted/50">{item.sub}</span>
+                  <span className="text-sm text-black/80 block truncate">{item.label}</span>
+                  <span className="text-[11px] text-black/50">{item.sub}</span>
                 </div>
-                <span className="text-[10px] text-hermes-text-muted/30 uppercase">{item.type}</span>
+                <span className="text-[10px] text-black/30 uppercase">{item.type}</span>
               </button>
             ))}
           </div>
