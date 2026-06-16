@@ -25,6 +25,14 @@ export default function Sidebar({
 }) {
   const [mobileTop, setMobileTop] = useState(0);
   const prevHidden = useRef(isMobile ? collapsed : hidden);
+  const activeRef = useRef(null);
+
+  // 侧边栏唤出时滚动到当前激活项
+  useEffect(() => {
+    if (!hidden && !collapsed && activeRef.current) {
+      activeRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [hidden, collapsed]);
 
   const widthClass = collapsed ? 'w-[60px]' : isMobile ? 'w-[280px] max-w-[85vw]' : 'w-[220px]';
 
@@ -76,7 +84,9 @@ export default function Sidebar({
           {/* 折叠按钮（桌面） */}
           {!isMobile && (
             <button onClick={onToggle}
-              className="absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10">
+              className={`absolute -right-3 top-6 w-6 h-6 sidebar-glass flex items-center justify-center hover:bg-black/5 transition-colors z-10 ${
+                hidden ? 'opacity-0 pointer-events-none' : ''
+              }`}>
               <ChevronLeft size={12} className={`text-hermes-gold transition-transform ${collapsed ? 'rotate-180' : ''}`} />
             </button>
           )}
@@ -101,9 +111,10 @@ export default function Sidebar({
               const Icon = item.icon;
               return (
                 <button key={item.id}
+                  ref={isActive ? activeRef : null}
                   onClick={() => { onTabChange(item.id); if (isMobile) onMobileClose(); }}
                   className={`w-full flex items-center gap-3 px-3 py-3 transition-all duration-200 text-left tap-target-nav ${
-                    isActive ? 'nav-active scale-[1.02]' : 'nav-inactive'
+                    isActive ? 'nav-active scale-[1.05] shadow-gold' : 'nav-inactive'
                   } ${isMobile && !collapsed ? 'py-4 text-base' : ''}`}
                   title={collapsed ? t(item.labelKey) : undefined}
                 >
