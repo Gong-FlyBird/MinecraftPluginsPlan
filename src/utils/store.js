@@ -345,22 +345,20 @@ export function useStore() {
   /* ──────── 全局 ──────── */
 
   const importStore = (data) => {
-    setStore(prev => {
-      const existingNames = new Set(prev.plugins.map(p => p.name));
-      const newPlugins = (data.plugins || []).filter(p => !existingNames.has(p.name));
-      const dupCount = (data.plugins?.length || 0) - newPlugins.length;
-      const msg = dupCount > 0
-        ? `导入 ${newPlugins.length} 个新插件，跳过 ${dupCount} 个重复`
-        : `导入 ${newPlugins.length} 个插件`;
-      toast(dupCount > 0 ? 'warning' : 'success', msg);
-      return {
-        ...prev,
-        plugins: [...prev.plugins, ...newPlugins],
-        standaloneIdeas: data.standaloneIdeas || [],
-        tags: data.tags || [],
-        bookmarkCollections: data.bookmarkCollections || prev.bookmarkCollections || [],
-      };
-    });
+    const existingNames = new Set(store.plugins.map(p => p.name));
+    const newPlugins = (data.plugins || []).filter(p => !existingNames.has(p.name));
+    const dupCount = (data.plugins?.length || 0) - newPlugins.length;
+    const msg = dupCount > 0
+      ? `导入 ${newPlugins.length} 个新插件，跳过 ${dupCount} 个重复`
+      : `导入 ${newPlugins.length} 个插件`;
+    toast(dupCount > 0 ? 'warning' : 'success', msg);
+    setStore(prev => ({
+      ...prev,
+      plugins: [...prev.plugins, ...newPlugins],
+      standaloneIdeas: data.standaloneIdeas || [],
+      tags: data.tags || [],
+      bookmarkCollections: data.bookmarkCollections || prev.bookmarkCollections || [],
+    }));
   };
 
   const resetStore = () => {
